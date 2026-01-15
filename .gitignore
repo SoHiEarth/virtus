@@ -1,2 +1,6 @@
 build/
 .DS_Store
+.cache/
+assignments.xml
+user_settings.xml
+compile_commands.json
