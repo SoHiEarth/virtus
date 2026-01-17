@@ -1,5 +1,7 @@
 #include "assignment.h"
 #include <vector>
+#include <sstream>
+#include <iomanip>
 
 std::vector<Assignment> LoadAssignmentsFromDatabase() {
     std::vector<Assignment> assignments;
@@ -81,36 +83,44 @@ void DrawPair(int x, const char* label, const char* value, bool highlight) {
 }
 
 void AssignmentMenu(Assignment& assignment) {
-  int button_index = 0;
+  int button_index_x = 0;
+  int button_index_y = 0;
   keypad(stdscr, TRUE);
   while (true) {
-    clear();
-    move(0, 2);
-    SetHeader(assignment.name);
-    move(1, 4);
-    SetSubHeader("Assignment Info");
-    DrawPair(2, "Name",         assignment.name,                      button_index == 0);
-    DrawPair(3, "Class",        assignment.class_name,                button_index == 1);
-    DrawPair(4, "Description",  assignment.description,               button_index == 2);
-    DrawPair(5, "Due Date",     assignment.due_date,                  button_index == 3);
-    DrawPair(6, "Completed",    assignment.completed ? "Yes" : "No",  button_index == 4);
-    DrawPair(7, "Score", std::to_string(assignment.score).c_str(),    button_index == 5);
-    move(8, 4);
-    SetSubHeader("Actions");
-    move(9, 6);
-    Button return_button = {"Go Back", button_index == 6};
-    return_button.Draw();
+    Interface interface;
+    interface.AddText(0,  3, assignment.name, HEADER);
+    interface.AddText(1,  4, "Assignment Info", SUBHEADER);
+    interface.AddText(0,  5, "Name", button_index_x == 0 ? REVERSE : NORMAL | BOLD);
+    interface.AddText(30, 5, assignment.name, button_index_x == 0 ? REVERSE : NORMAL);
+    interface.AddText(0,  6, "Class", button_index_x == 1 ? REVERSE : NORMAL | BOLD);
+    interface.AddText(30, 6, assignment.class_name, button_index_x == 1 ? REVERSE : NORMAL);
+    interface.AddText(0,  7, "Description", button_index_x == 2 ? REVERSE : NORMAL | BOLD);
+    interface.AddText(30, 7, assignment.description, button_index_x == 2 ? REVERSE : NORMAL);
+    interface.AddText(0,  8, "Due Date", button_index_x == 3 ? REVERSE : NORMAL | BOLD);
+    interface.AddText(30, 8, assignment.due_date, button_index_x == 3 ? REVERSE : NORMAL);
+    interface.AddText(0,  9, "Completed", button_index_x == 4 ? REVERSE : NORMAL | BOLD);
+    interface.AddText(30, 9, assignment.completed ? "Yes" : "No", button_index_x == 4 ? REVERSE : NORMAL);
+    interface.AddText(0, 10, "Score", button_index_x == 5 ? REVERSE : NORMAL | BOLD);
+    std::ostringstream score_stream;
+    score_stream << std::fixed << std::setprecision(2) << assignment.score << "% / " << assignment.max_score << "%";
+    interface.AddText(30, 10, score_stream.str(), button_index_x == 5 ? REVERSE : NORMAL);
+    interface.AddText(0, 12, "Actions", SUBHEADER);
+    interface.AddText(6, 13, "[ Go Back ]", button_index_x == 6 ? REVERSE : NORMAL);
+    interface.Draw(-1, -1, true);
+
     auto ch = getch();
-    if (ch == KEY_UP) {
-      if (button_index > 0) {
-        --button_index;
+    if (ch == 'q' || ch == 'Q') {
+      return;
+    } else if (ch == KEY_UP) {
+      if (button_index_x > 0) {
+        --button_index_x;
       }
     } else if (ch == KEY_DOWN) {
-      if (button_index < 6) {
-        ++button_index;
+      if (button_index_x < 6) {
+        ++button_index_x;
       }
     } else if (ch == '\n') {
-      switch (button_index) {
+      switch (button_index_x) {
         case 0: { // Name
           printw("Enter new name: ");
           char buffer[256];
@@ -168,27 +178,23 @@ Tab Assignments() {
   int button_index_x = 1, button_index_y = 0;
   auto assignments = LoadAssignmentsFromDatabase();
   while (true) {
-    clear();
-    DrawTabBar({"Home", "Assignments", "Grades", "Settings"}, 1, button_index_y == 0 ? button_index_x : -1);
-    move(3, 2);
-    SetHeader("All Assignments");
+    Interface interface;
+    interface.AddText(0, 3, "All Assignments", HEADER);
     for (size_t i = 0; i < assignments.size(); ++i) {
-      auto& assignment = assignments[i];
+      int style = NORMAL;
       if (i == button_index_y - 1) {
-        attron(A_REVERSE);
+        style = REVERSE;
       }
-      attron(A_BOLD);
-      mvprintw(i + 4, 4, "%s", assignment.name);
-      attroff(A_BOLD);
-      mvprintw(i + 4, 24, "Class: %s", assignment.class_name);
-      mvprintw(i + 4, 49, "Due: %s", assignment.due_date);
-      mvprintw(i + 4, 74, "Completed: %s", assignment.completed ? "Yes" : "No");
-      mvprintw(i + 4, 99, "Score: %.2f%%/%.2f%%", assignment.score, assignment.max_score);
-      if (i == button_index_y - 1) {
-        attroff(A_REVERSE);
-      }
+      interface.AddText(0, i + 4, assignments[i].name, style | BOLD);
+      interface.AddText(24, i + 4, "Class: " + assignments[i].class_name, style);
+      interface.AddText(49, i + 4, "Due: " + assignments[i].due_date, style);
+      interface.AddText(74, i + 4, "Completed: " + std::string(assignments[i].completed ? "Yes" : "No"), style);
+      std::ostringstream score_stream;
+      score_stream << std::fixed << std::setprecision(2) << assignments[i].score << "% / " << assignments[i].max_score << "%";
+      interface.AddText(99, i + 4, score_stream.str(), style);
     }
-    refresh();
+    interface.Draw(1, button_index_y == 0 ? button_index_x : -1);
+
     auto ch = getch();
     switch (ch) {
       case KEY_UP:

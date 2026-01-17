@@ -1,16 +1,16 @@
 #include "grades.h"
 #include "interface.h"
 #include "assignment.h"
+#include <map>
+#include <format>
 
 Tab Grades() {
   keypad(stdscr, TRUE);
   int button_index_x = 2, button_index_y = 0;
   auto assignments = LoadAssignmentsFromDatabase();
   while (true) {
-    clear();
-    DrawTabBar({"Home", "Assignments", "Grades", "Settings"}, 2, button_index_y == 0 ? button_index_x : -1);
-    move(3, 2);
-    SetHeader("Overall");
+    Interface interface;
+    interface.AddText(0, 3, "Overall", HEADER);
     int grade_sum = 0;
     int grade_count = 0;
     for (const auto& assignment : assignments) {
@@ -19,9 +19,23 @@ Tab Grades() {
         ++grade_count;
       }
     }
-    mvprintw(4, 4, "Overall Grade: %.2f%% (Sum: %d, Grades counted: %d)", (grade_count != 0) ? (static_cast<double>(grade_sum)/grade_count) : 0, grade_sum, grade_count);
-    mvprintw(5, 4, "Completed Assignments: %d/%d", grade_count, static_cast<int>(assignments.size()));
-    refresh();
+    interface.AddText(0, 4, std::format("Overall Grade: {:.2f}%", (grade_count != 0) ? (static_cast<double>(grade_sum)/grade_count) : 0));
+    interface.AddText(0, 5, std::format("Completed Assignments: {}/{}", grade_count, static_cast<int>(assignments.size())));
+    interface.AddText(0, 7, "Grades by Class", SUBHEADER);
+    std::map<std::string, std::pair<int, int>> class_grades;
+    for (const auto& assignment : assignments) {
+      if (assignment.completed) {
+        class_grades[assignment.class_name].first += assignment.score;
+        class_grades[assignment.class_name].second += 1;
+      }
+    }
+    int line = 8;
+    for (const auto& [class_name, grades] : class_grades) {
+      interface.AddText(0, line, class_name);
+      interface.AddText(20, line, std::format("{:.2f}%", (grades.second != 0) ? (static_cast<double>(grades.first)/grades.second) : 0));
+      line++;
+    }
+    interface.Draw(2, button_index_y == 0 ? button_index_x : -1);
     auto ch = getch();
     switch (ch) {
       case KEY_UP:

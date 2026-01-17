@@ -9,39 +9,27 @@ Tab Home() {
   keypad(stdscr, TRUE);
   int button_index_x = 0, button_index_y = 0;
   while (true) {
-    clear();
-    DrawTabBar({"Home", "Assignments", "Grades", "Settings"}, 0, button_index_y == 0 ? button_index_x : -1);
-    move(3, 2);
-    SetHeader(std::format("Welcome, {} {} (School: {})\n", user_settings::student_first_name, user_settings::student_last_name, user_settings::school_name).c_str());
+    Interface interface;
+    interface.AddText(0, 3, std::format("Welcome, {} {} (School: {})", user_settings::student_first_name, user_settings::student_last_name, user_settings::school_name), HEADER);
     std::vector<Assignment> assignments;
     assignments = LoadAssignmentsFromDatabase();
-    move(4, 4);
-    SetSubHeader("Your Assignments");
+    interface.AddText(0, 4, "Your Assignments", SUBHEADER);
     for (size_t i = 0; i < assignments.size() && i < 5; ++i) {
+      int style = NORMAL;
       if (i == button_index_y - 1) {
-        attron(A_REVERSE);
+        style |= REVERSE;
       }
-      attron(A_BOLD);
-      mvprintw((int)i + 5, 6, "%s", assignments[i].name);
-      attroff(A_BOLD);
-      mvprintw((int)i + 5, 26, "Class: %s", assignments[i].class_name);
-      mvprintw((int)i + 5, 46, "Due: %s", assignments[i].due_date);
-      mvprintw((int)i + 5, 66, "Completed: %s", assignments[i].completed ? "Yes" : "No");
-      mvprintw((int)i + 5, 81, "Score: %.2f%%/%.2f%%", assignments[i].score, assignments[i].max_score);
-      if (i == button_index_y - 1) {
-        attroff(A_REVERSE);
-      }
+      interface.AddText(0, (int)i + 5, assignments[i].name, style | BOLD);
+      interface.AddText(20, (int)i + 5, std::format("Class: {}", assignments[i].class_name), style);
+      interface.AddText(40, (int)i + 5, std::format("Due: {}", assignments[i].due_date), style);
+      interface.AddText(60, (int)i + 5, std::format("Completed: {}", assignments[i].completed ? "Yes" : "No"), style);
+      interface.AddText(80, (int)i + 5, std::format("Score: {:.2f}%/{:.2f}%", assignments[i].score, assignments[i].max_score), style);
     }
-    printw("\n");
     if (assignments.size() > 5) {
-      mvprintw(10, 6, "...and %d more assignments not shown.\n", static_cast<int>(assignments.size() - 5));
+      interface.AddText(0, 10, std::format("...and {} more assignments not shown.", assignments.size() - 5));
     }
-    move(11, 6);
-    Button add_assignment_button = {"Add New Assignment", button_index_y - 1 == std::min((int)assignments.size(), 5)};
-    add_assignment_button.Draw();
-
-    move(12, 4);
-    SetSubHeader("Your Grades");
+    interface.AddText(0, 11, "[ Add New Assignment ]", button_index_y - 1 == std::min((int)assignments.size(), 5) ? REVERSE : NORMAL);
+    interface.AddText(0, 12, "Grades Summary", SUBHEADER);
     float grade_sum = 0;
     int grade_count = 0;
     for (const auto& assignment : assignments) {
@@ -50,9 +38,9 @@ Tab Home() {
         ++grade_count;
       }
     }
-    mvprintw(13, 6, "Overall Grade: %.2f%% (Sum: %.2f%%, Grades counted: %d)\n", grade_count > 0 ? static_cast<double>(grade_sum) / grade_count : 0.0, grade_sum, grade_count);
-    mvprintw(14, 6, "Completed Assignments: %d/%d", grade_count, static_cast<int>(assignments.size()));
-    refresh();
+    interface.AddText(0, 13, std::format("Overall Grade: {:.2f}% (Sum: {:.2f}%, Grades counted: {})", grade_count > 0 ? static_cast<double>(grade_sum) / grade_count : 0.0, grade_sum, grade_count));
+    interface.AddText(0, 14, std::format("Completed Assignments: {}/{}", grade_count, static_cast<int>(assignments.size())));
+    interface.Draw(0, button_index_y == 0 ? button_index_x : -1);
 
     auto ch = getch();
     if (ch == '\n') {

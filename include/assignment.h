@@ -5,13 +5,13 @@
 #include "interface.h"
 
 struct Assignment {
-    const char* name = "";
-    const char* class_name = "";
-    const char* description = "";
-    const char* due_date = "";
-    bool completed = false;
-    float score = 0;
-    float max_score = 100;
+  std::string name = "";
+  std::string class_name = "";
+  std::string description = "";
+  std::string due_date = "";
+  bool completed = false;
+  float score = 0;
+  float max_score = 100;
 };
 
 std::vector<Assignment> LoadAssignmentsFromDatabase();

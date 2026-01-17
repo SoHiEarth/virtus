@@ -12,14 +12,25 @@ void SetSubHeader(const char* subtitle) {
   attroff(A_BOLD | A_DIM);
 }
 
-void DrawTabBar(std::vector<std::string> tabs, int active_index, int focused_index) {
+void DrawTabBar(std::vector<std::string> tabs, int active_index, int focused_index, bool show_app_title, bool disabled_tab_bar) {
   int width = getmaxx(stdscr);
-  for (int i = 0; i < width; ++i) {
-    mvprintw(0, i, "-");
+  if (disabled_tab_bar) {
+    attron(A_DIM);
   }
-  attron(A_ITALIC | A_DIM);
-  mvprintw(1, 1, "Virtus ");
-  attroff(A_ITALIC | A_DIM);
+  if (!interface_config::simple_tab_bar) {
+    for (int i = 0; i < width; ++i) {
+      mvprintw(0, i, "-");
+    }
+  }
+  move(1, 1);
+  if (show_app_title) {
+    attron(A_ITALIC | A_DIM);
+    printw("Virtus ");
+    attroff(A_ITALIC | A_DIM);
+  }
+  if (disabled_tab_bar) {
+    attron(A_DIM);
+  }
   for (size_t i = 0; i < tabs.size(); ++i) {
     printw("|");
     if (i == active_index) {
@@ -37,9 +48,13 @@ void DrawTabBar(std::vector<std::string> tabs, int active_index, int focused_ind
     }
   }
   printw("|");
-  printw("\n");
-  for (int i = 0; i < width; ++i) {
-    mvprintw(2, i, "-");
+  if (!interface_config::simple_tab_bar) {
+    for (int i = 0; i < width; ++i) {
+      mvprintw(2, i, "-");
+    }
+  }
+  if (disabled_tab_bar) {
+    attroff(A_DIM);
   }
 }
 

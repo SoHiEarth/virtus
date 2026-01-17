@@ -50,44 +50,53 @@ Tab Settings() {
     {"Error Logging", []() { settings::error_logging = !settings::error_logging; }, []() { return settings::error_logging ? "On" : "Off"; }},
     {"Reset User Settings", []() { std::filesystem::remove("user_settings.xml"); }, []() { return ""; }},
   };
-  while (true) {
-    clear();
-    DrawTabBar({"Home", "Assignments", "Grades", "Settings"}, 3, button_index_y == 0 ? button_index_x : -1);
-    move(3, 2);
-    SetHeader("General");
-    move(4, 4);
-    SetSubHeader("Assignment Management");
-    for (size_t i = 0; i < settings_list.size(); ++i) {
-      if (i == button_index_y - 1 && button_index_x == 0) {
-        attron(A_REVERSE);
-      }
-      mvprintw(i + 5, 6, "%s", settings_list[i].name.c_str());
-      mvprintw(i + 5, 6 + SETTING_NAME_WIDTH, "%s\n", settings_list[i].get_status().c_str());
-      if (i == button_index_y - 1 && button_index_x == 0) {
-        attroff(A_REVERSE);
-      }
-    }
-
-    move(5 + settings_list.size(), 4);
-    SetSubHeader("User Profile");
-    std::vector<Setting> profile_settings = {
+  std::vector<Setting> profile_settings = {
       {"School Name", []() {}, []() { return user_settings::school_name; }},
       {"First Name: ", []() {}, []() { return user_settings::student_first_name; }},
       {"Last Name: ", []() {}, []() { return user_settings::student_last_name; }},
-    };
-    for (size_t i = 0; i < profile_settings.size(); ++i)
-    {
-      if (i + settings_list.size() + 1 == button_index_y && button_index_x == 0) {
-        attron(A_REVERSE);
+  };
+  std::vector<Setting> interface_settings = {
+    {"Show App Title", []() { interface_config::show_app_title = !interface_config::show_app_title; }, []() { return interface_config::show_app_title ? "On" : "Off"; }},
+    {"Simple Tab Bar", []() { interface_config::simple_tab_bar = !interface_config::simple_tab_bar; }, []() { return interface_config::simple_tab_bar ? "On" : "Off"; }},
+    {"Disable Fancy Text", []() { interface_config::disable_fancy_text = !interface_config::disable_fancy_text; }, []() { return interface_config::disable_fancy_text ? "On" : "Off"; }},
+    {"Padding Left", []() { interface_config::padding_left = (interface_config::padding_left == 0) ? 2 : 0; }, []() { return std::to_string(interface_config::padding_left); }},
+  };
+
+  while (true) {
+    Interface interface;
+    interface.AddText(0, 3, "General", HEADER);
+
+    interface.AddText(0, 4, "Assignment Management", SUBHEADER);
+    for (size_t i = 0; i < settings_list.size(); ++i) {
+      int style = NORMAL;
+      if (i == button_index_y - 1 && button_index_x == 0) {
+        style |= REVERSE;
       }
-      mvprintw(i + 6 + settings_list.size(), 6, "%s", profile_settings[i].name.c_str());
-      mvprintw(i + 6 + settings_list.size(), 6 + SETTING_NAME_WIDTH, "%s\n", profile_settings[i].get_status().c_str());
-      if (i + settings_list.size() + 1 == button_index_y && button_index_x == 0) {
-        attroff(A_REVERSE);
-      }
+      interface.AddText(0, i + 5, settings_list[i].name, style | BOLD);
+      interface.AddText(SETTING_NAME_WIDTH, i + 5, settings_list[i].get_status(), style);
     }
 
-    refresh();
+    interface.AddText(0, 5 + settings_list.size(), "User Profile", SUBHEADER);
+    for (size_t i = 0; i < profile_settings.size(); ++i) {
+      int style = NORMAL;
+      if (i + settings_list.size() + 1 == button_index_y && button_index_x == 0) {
+        style |= REVERSE;
+      }
+      interface.AddText(0, i + 6 + settings_list.size(), profile_settings[i].name, style | BOLD);
+      interface.AddText(SETTING_NAME_WIDTH, i + 6 + settings_list.size(), profile_settings[i].get_status(), style);
+    }
+
+    interface.AddText(0, 7 + settings_list.size() + profile_settings.size(), "Interface", SUBHEADER);
+    for (size_t i = 0; i < interface_settings.size(); ++i) {
+      int style = NORMAL;
+      if (i + settings_list.size() + profile_settings.size() + 1 == button_index_y && button_index_x == 0) {
+        style |= REVERSE;
+      }
+      interface.AddText(0, i + 8 + settings_list.size() + profile_settings.size(), interface_settings[i].name, style | BOLD);
+      interface.AddText(SETTING_NAME_WIDTH, i + 8 + settings_list.size() + profile_settings.size(), interface_settings[i].get_status(), style);
+    }
+    interface.Draw(true, 3, button_index_y == 0 ? button_index_x : -1);
+
     auto ch = getch();
     switch (ch) {
       case KEY_UP:
@@ -97,7 +106,7 @@ Tab Settings() {
         button_index_x = 0;
         break;
       case KEY_DOWN:
-        if (button_index_y < settings_list.size() + profile_settings.size()) {
+        if (button_index_y < settings_list.size() + profile_settings.size() + interface_settings.size()) {
           ++button_index_y;
         }
         button_index_x = 0;
@@ -124,7 +133,7 @@ Tab Settings() {
         } else {
           if (button_index_y - 1 < settings_list.size())
             settings_list[button_index_y - 1].toggle();
-          else {
+          else if (button_index_y - 1 < settings_list.size() + profile_settings.size()) {
             size_t profile_index = button_index_y - 1 - settings_list.size();
             echo();
             char input[100];
@@ -141,6 +150,9 @@ Tab Settings() {
               getnstr(input, 99);
               user_settings::student_last_name = std::string(input);
             }
+          } else {
+            size_t interface_index = button_index_y - 1 - settings_list.size() - profile_settings.size();
+            interface_settings[interface_index].toggle();
           }
         }
         break;
