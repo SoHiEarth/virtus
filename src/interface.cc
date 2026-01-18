@@ -1,18 +1,19 @@
 #include "interface.h"
 
-void SetHeader(const char* title) {
+void SetHeader(const char *title) {
   attron(A_BOLD);
   printw("%s\n", title);
   attroff(A_BOLD);
 }
 
-void SetSubHeader(const char* subtitle) {
+void SetSubHeader(const char *subtitle) {
   attron(A_BOLD | A_DIM);
   printw("%s\n", subtitle);
   attroff(A_BOLD | A_DIM);
 }
 
-void DrawTabBar(std::vector<std::string> tabs, int active_index, int focused_index, bool show_app_title, bool disabled_tab_bar) {
+void DrawTabBar(std::vector<std::string> tabs, int active_index,
+                int focused_index, bool show_app_title, bool disabled_tab_bar) {
   int width = getmaxx(stdscr);
   if (disabled_tab_bar) {
     attron(A_DIM);
@@ -57,4 +58,3 @@ void DrawTabBar(std::vector<std::string> tabs, int active_index, int focused_ind
     attroff(A_DIM);
   }
 }
-

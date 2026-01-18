@@ -1,18 +1,11 @@
 #pragma once
 #include <ncurses.h>
-#include <vector>
 #include <string>
-enum class Tab {
-    HOME,
-    ASSIGNMENTS,
-    GRADES,
-    CALENDAR,
-    SETTINGS,
-    NONE
-};
+#include <vector>
+enum class Tab { HOME, ASSIGNMENTS, GRADES, CALENDAR, SETTINGS, NONE };
 
 struct Button {
-  const char* label;
+  const char *label;
   bool focused;
   void Draw(bool notab = false) {
     if (focused) {
@@ -28,12 +21,12 @@ struct Button {
 };
 
 enum Style : int {
-  NORMAL    = 0,
-  BOLD      = 1 << 0,
-  ITALIC    = 1 << 1,
-  DIM       = 1 << 2,
-  REVERSE   = 1 << 3,
-  HEADER    = 1 << 4,
+  NORMAL = 0,
+  BOLD = 1 << 0,
+  ITALIC = 1 << 1,
+  DIM = 1 << 2,
+  REVERSE = 1 << 3,
+  HEADER = 1 << 4,
   SUBHEADER = 1 << 5,
 };
 
@@ -44,16 +37,18 @@ struct TextObject {
   int style;
 };
 
-void SetHeader(const char* title);
-void SetSubHeader(const char* subtitle);
-void DrawTabBar(std::vector<std::string> tabs, int active_index, int focused_index = 0, bool show_app_title = true, bool disabled_tab_bar = false);
+void SetHeader(const char *title);
+void SetSubHeader(const char *subtitle);
+void DrawTabBar(std::vector<std::string> tabs, int active_index,
+                int focused_index = 0, bool show_app_title = true,
+                bool disabled_tab_bar = false);
 
 namespace interface_config {
-  inline int padding_left = 2;
-  inline bool show_app_title = true;
-  inline bool simple_tab_bar = false;
-  inline bool disable_fancy_text = false;
-}
+inline int padding_left = 2;
+inline bool show_app_title = true;
+inline bool simple_tab_bar = false;
+inline bool disable_fancy_text = false;
+} // namespace interface_config
 
 struct Interface {
   std::vector<TextObject> texts;
@@ -62,11 +57,14 @@ struct Interface {
     texts.push_back({x, y, std::string(content), style});
   }
 
-  void Draw(int active_tab = 0, int focused_tab = -1, bool disabled_tab_bar = false) {
+  void Draw(int active_tab = 0, int focused_tab = -1,
+            bool disabled_tab_bar = false) {
     clear();
-    DrawTabBar({"Home", "Assignments", "Grades", "Calendar", "Settings"}, active_tab, focused_tab, interface_config::show_app_title, disabled_tab_bar);
+    DrawTabBar({"Home", "Assignments", "Grades", "Calendar", "Settings"},
+               active_tab, focused_tab, interface_config::show_app_title,
+               disabled_tab_bar);
     int indent_level = 0;
-    for (const auto& text : texts) {
+    for (const auto &text : texts) {
       move(text.y, text.x);
       for (int i = 0; i < interface_config::padding_left; ++i)
         printw(" ");
@@ -101,7 +99,7 @@ struct Interface {
         indent_level = 2;
       }
     }
-    move(LINES - 2, 2); 
+    move(LINES - 2, 2);
     printw("Use arrow keys to navigate tabs, Enter to select, Q to quit.");
     refresh();
   }

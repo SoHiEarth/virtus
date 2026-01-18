@@ -1,13 +1,13 @@
-#include <ncurses.h>
-#include <string>
-#include <filesystem>
-#include <pugixml.hpp>
 #include "assignment.h"
-#include "interface.h"
-#include "settings.h"
+#include "calendar.h"
 #include "grades.h"
 #include "home.h"
-#include "calendar.h"
+#include "interface.h"
+#include "settings.h"
+#include <filesystem>
+#include <ncurses.h>
+#include <pugixml.hpp>
+#include <string>
 
 void InitialSetupPrompt() {
   SetSubHeader("Initial Setup");
@@ -24,23 +24,24 @@ void InitialSetupPrompt() {
   refresh();
   user_settings::school_name.resize(256);
   getnstr(user_settings::school_name.data(), 255);
-  while (user_settings::student_first_name.empty() || user_settings::student_last_name.empty() || user_settings::school_name.empty()) {
-      printw("All fields are required. Please try again.\n");
-      printw("First name: ");
-      refresh();
-      getstr(user_settings::student_first_name.data());
-      printw("Last name: ");
-      refresh();
-      getstr(user_settings::student_last_name.data());
-      printw("School name: ");
-      refresh();
-      getstr(user_settings::school_name.data());
+  while (user_settings::student_first_name.empty() ||
+         user_settings::student_last_name.empty() ||
+         user_settings::school_name.empty()) {
+    printw("All fields are required. Please try again.\n");
+    printw("First name: ");
+    refresh();
+    getstr(user_settings::student_first_name.data());
+    printw("Last name: ");
+    refresh();
+    getstr(user_settings::student_last_name.data());
+    printw("School name: ");
+    refresh();
+    getstr(user_settings::school_name.data());
   }
   SaveUserSettings();
   printw("Setup complete! Press any key to exit.");
   refresh();
 }
-
 
 int main() {
   initscr();
@@ -51,7 +52,7 @@ int main() {
   } else {
     try {
       LoadUserSettings();
-    } catch (const std::exception& e) {
+    } catch (const std::exception &e) {
       printw("Error loading user settings: %s\n", e.what());
       printw("Starting initial setup...\n");
       refresh();
@@ -62,24 +63,24 @@ int main() {
   Tab current_tab = Tab::HOME;
   while (current_tab != Tab::NONE) {
     switch (current_tab) {
-      case Tab::HOME:
-        current_tab = Home();
-        break;
-      case Tab::ASSIGNMENTS:
-        current_tab = Assignments();
-        break;
-      case Tab::GRADES:
-        current_tab = Grades();
-        break;
-      case Tab::CALENDAR:
-        current_tab = Calendar();
-        break;
-      case Tab::SETTINGS:
-        current_tab = Settings();
-        break;
-      default:
-        current_tab = Tab::NONE;
-        break;
+    case Tab::HOME:
+      current_tab = Home();
+      break;
+    case Tab::ASSIGNMENTS:
+      current_tab = Assignments();
+      break;
+    case Tab::GRADES:
+      current_tab = Grades();
+      break;
+    case Tab::CALENDAR:
+      current_tab = Calendar();
+      break;
+    case Tab::SETTINGS:
+      current_tab = Settings();
+      break;
+    default:
+      current_tab = Tab::NONE;
+      break;
     }
   }
   endwin();

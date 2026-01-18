@@ -1,9 +1,9 @@
-#include <vector>
-#include <format>
+#include "home.h"
 #include "assignment.h"
 #include "interface.h"
-#include "home.h"
 #include "settings.h"
+#include <format>
+#include <vector>
 
 Tab Home() {
   keypad(stdscr, TRUE);
@@ -11,7 +11,12 @@ Tab Home() {
   while (true) {
     Interface interface;
     int line = interface_config::simple_tab_bar ? 1 : 3;
-    interface.AddText(0, line++, std::format("Welcome, {} {} (School: {})", user_settings::student_first_name, user_settings::student_last_name, user_settings::school_name), HEADER);
+    interface.AddText(0, line++,
+                      std::format("Welcome, {} {} (School: {})",
+                                  user_settings::student_first_name,
+                                  user_settings::student_last_name,
+                                  user_settings::school_name),
+                      HEADER);
     std::vector<Assignment> assignments;
     assignments = LoadAssignmentsFromDatabase();
     interface.AddText(0, line++, "Your Assignments", SUBHEADER);
@@ -21,30 +26,61 @@ Tab Home() {
         style |= REVERSE;
       }
       int column = 0;
-      interface.AddText(column,    line, assignments[i].name, style | BOLD);
-      interface.AddText(column += 30,   line, std::format("Class: {}", assignments[i].class_name), style);
-      interface.AddText(column += 30,   line, std::format("Due: {}", assignments[i].due_date), style);
-      interface.AddText(column += 30,   line, std::format("Completed: {}", assignments[i].completed ? "Yes" : "No"), style);
-      interface.AddText(column += 30,  line, std::format("Score: {:.2f}%/{:.2f}%", assignments[i].score, assignments[i].max_score), style);
+      interface.AddText(column, line, assignments[i].name, style | BOLD);
+      interface.AddText(column += 30, line,
+                        std::format("Class: {}", assignments[i].class_name),
+                        style);
+      interface.AddText(column += 30, line,
+                        std::format("Due: {}", assignments[i].due_date), style);
+      interface.AddText(
+          column += 30, line,
+          std::format("Completed: {}", assignments[i].completed ? "Yes" : "No"),
+          style);
+      interface.AddText(column += 30, line,
+                        std::format("Score: {:.2f}%/{:.2f}%",
+                                    assignments[i].score,
+                                    assignments[i].max_score),
+                        style);
       line++;
     }
     if (assignments.size() > 5) {
-      interface.AddText(0, line++, std::format("...and {} more assignments not shown.", assignments.size() - 5));
+      interface.AddText(0, line++,
+                        std::format("...and {} more assignments not shown.",
+                                    assignments.size() - 5));
     }
-    interface.AddText(0, line, "[ Add New Assignment ]", (button_index_y - 1 == std::min((int)assignments.size(), 5) && button_index_x == 0) ? REVERSE : NORMAL);
-    interface.AddText(30, line++, "[ Remove Assignment ]", (button_index_y - 1 == std::min((int)assignments.size(), 5) && button_index_x > 0) ? REVERSE : NORMAL);
+    interface.AddText(
+        0, line, "[ Add New Assignment ]",
+        (button_index_y - 1 == std::min((int)assignments.size(), 5) &&
+         button_index_x == 0)
+            ? REVERSE
+            : NORMAL);
+    interface.AddText(
+        30, line++, "[ Remove Assignment ]",
+        (button_index_y - 1 == std::min((int)assignments.size(), 5) &&
+         button_index_x > 0)
+            ? REVERSE
+            : NORMAL);
     interface.AddText(0, line++, "Grades Summary", SUBHEADER);
     float grade_sum = 0;
     int grade_count = 0;
-    for (const auto& assignment : assignments) {
+    for (const auto &assignment : assignments) {
       if (assignment.completed) {
         grade_sum += (assignment.score / assignment.max_score) * 100.0f;
         ++grade_count;
       }
     }
-    interface.AddText(0, line++, std::format("Overall Grade: {:.2f}%, GPA: {:.2f}", grade_count > 0 ? static_cast<double>(grade_sum) / grade_count : 0.0,
-          (grade_count > 0 ? static_cast<double>(grade_sum) / grade_count : 0.0)/20.0));
-    interface.AddText(0, line++, std::format("Completed Assignments: {}/{}", grade_count, static_cast<int>(assignments.size())));
+    interface.AddText(
+        0, line++,
+        std::format(
+            "Overall Grade: {:.2f}%, GPA: {:.2f}",
+            grade_count > 0 ? static_cast<double>(grade_sum) / grade_count
+                            : 0.0,
+            (grade_count > 0 ? static_cast<double>(grade_sum) / grade_count
+                             : 0.0) /
+                20.0));
+    interface.AddText(0, line++,
+                      std::format("Completed Assignments: {}/{}", grade_count,
+                                  static_cast<int>(assignments.size())));
     interface.Draw(0, button_index_y == 0 ? button_index_x : -1);
 
     auto ch = getch();
@@ -99,4 +135,3 @@ Tab Home() {
   }
   return Tab::NONE;
 }
-
