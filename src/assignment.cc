@@ -3,6 +3,7 @@
 #include <sstream>
 #include <vector>
 #include "string.h"
+#include <algorithm>
 
 std::vector<Assignment> LoadAssignmentsFromDatabase() {
   std::vector<Assignment> assignments;
