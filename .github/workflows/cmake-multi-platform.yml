@@ -33,6 +33,15 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
+    - name: Setup vcpkg
+      if: runner.os == 'Windows'
+      uses: lukka/run-vcpkg@v11
+
+    - name: Install dependencies (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        vcpkg install pugixml ncurses
+
     - name: Install Dependencies (Ubuntu)
       if: runner.os == 'Linux'
       run: |
@@ -40,12 +49,24 @@ jobs:
         sudo apt install -y libpugixml-dev
 
     - name: Configure CMake
+      if: runner.os == 'Linux'
       run: >
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
         -S ${{ github.workspace }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+
+    - name: Configure CMake
+      if: runner.os == 'Windows'
+      run: >
+        cmake -B ${{ steps.strings.outputs.build-output-dir }}
+          -S ${{ github.workspace }}
+          -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
+          -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+          -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+
 
     - name: Build
       run: |
