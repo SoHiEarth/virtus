@@ -61,6 +61,12 @@ Assignment NewAssignment() {
   printw("Enter due date (YYYY-MM-DD): ");
   refresh();
   getnstr(buffer, 255);
+  // If not valid, try again
+  while (sscanf(buffer, "%d-%d-%d", new int, new int, new int) != 3) {
+    printw("Invalid date format. Please use YYYY-MM-DD.\n");
+    refresh();
+    getnstr(buffer, 255);
+  }
   assignment.due_date = strdup(buffer);
   assignment.completed = false;
   assignment.score = 0;
@@ -80,6 +86,10 @@ void DrawPair(int x, const char* label, const char* value, bool highlight) {
   if (highlight) {
     attroff(A_REVERSE);
   }
+}
+
+void AssignmentMenu(Assignment* assignment) {
+  AssignmentMenu(*assignment);
 }
 
 void AssignmentMenu(Assignment& assignment) {
@@ -150,6 +160,11 @@ void AssignmentMenu(Assignment& assignment) {
           char buffer[256];
           refresh();
           getnstr(buffer, 255);
+          while (sscanf(buffer, "%d-%d-%d", new int, new int, new int) != 3) {
+            printw("Invalid date format. Please use YYYY-MM-DD.\n");
+            refresh();
+            getnstr(buffer, 255);
+          }
           assignment.due_date = strdup(buffer);
           break;
         }
@@ -163,6 +178,7 @@ void AssignmentMenu(Assignment& assignment) {
           refresh();
           getnstr(buffer, 255);
           assignment.score = atof(buffer);
+          assignment.score = std::clamp(assignment.score, 0.0f, assignment.max_score);
           break;
         }
         case 6: // Go Back
@@ -179,19 +195,22 @@ Tab Assignments() {
   auto assignments = LoadAssignmentsFromDatabase();
   while (true) {
     Interface interface;
-    interface.AddText(0, 3, "All Assignments", HEADER);
+    int line = interface_config::simple_tab_bar ? 1 : 3;
+    interface.AddText(0, line++, "All Assignments", HEADER);
     for (size_t i = 0; i < assignments.size(); ++i) {
       int style = NORMAL;
       if (i == button_index_y - 1) {
         style = REVERSE;
       }
-      interface.AddText(0, i + 4, assignments[i].name, style | BOLD);
-      interface.AddText(24, i + 4, "Class: " + assignments[i].class_name, style);
-      interface.AddText(49, i + 4, "Due: " + assignments[i].due_date, style);
-      interface.AddText(74, i + 4, "Completed: " + std::string(assignments[i].completed ? "Yes" : "No"), style);
+      int column = 0;
+      interface.AddText(column, line, assignments[i].name, style | BOLD);
+      interface.AddText(column += 30, line, "Class: " + assignments[i].class_name, style);
+      interface.AddText(column += 30, line, "Due: " + assignments[i].due_date, style);
+      interface.AddText(column += 30, line, "Completed: " + std::string(assignments[i].completed ? "Yes" : "No"), style);
       std::ostringstream score_stream;
       score_stream << std::fixed << std::setprecision(2) << assignments[i].score << "% / " << assignments[i].max_score << "%";
-      interface.AddText(99, i + 4, score_stream.str(), style);
+      interface.AddText(column += 30, line, "Score: " + score_stream.str(), style);
+      line++;
     }
     interface.Draw(1, button_index_y == 0 ? button_index_x : -1);
 
@@ -215,7 +234,7 @@ Tab Assignments() {
         }
         break;
       case KEY_RIGHT:
-        if (button_index_x < 3) {
+        if (button_index_x < 4) {
           ++button_index_x;
         }
         break;
@@ -226,6 +245,8 @@ Tab Assignments() {
           } else if (button_index_x == 2) {
             return Tab::GRADES;
           } else if (button_index_x == 3) {
+            return Tab::CALENDAR;
+          } else if (button_index_x == 4) {
             return Tab::SETTINGS;
           }
         } else {

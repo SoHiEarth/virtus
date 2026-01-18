@@ -7,6 +7,7 @@
 #include "settings.h"
 #include "grades.h"
 #include "home.h"
+#include "calendar.h"
 
 void InitialSetupPrompt() {
   SetSubHeader("Initial Setup");
@@ -69,6 +70,9 @@ int main() {
         break;
       case Tab::GRADES:
         current_tab = Grades();
+        break;
+      case Tab::CALENDAR:
+        current_tab = Calendar();
         break;
       case Tab::SETTINGS:
         current_tab = Settings();

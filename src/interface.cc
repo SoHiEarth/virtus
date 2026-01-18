@@ -22,7 +22,7 @@ void DrawTabBar(std::vector<std::string> tabs, int active_index, int focused_ind
       mvprintw(0, i, "-");
     }
   }
-  move(1, 1);
+  move(interface_config::simple_tab_bar ? 0 : 1, 1);
   if (show_app_title) {
     attron(A_ITALIC | A_DIM);
     printw("Virtus ");

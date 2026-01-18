@@ -6,6 +6,7 @@ enum class Tab {
     HOME,
     ASSIGNMENTS,
     GRADES,
+    CALENDAR,
     SETTINGS,
     NONE
 };
@@ -63,7 +64,7 @@ struct Interface {
 
   void Draw(int active_tab = 0, int focused_tab = -1, bool disabled_tab_bar = false) {
     clear();
-    DrawTabBar({"Home", "Assignments", "Grades", "Settings"}, active_tab, focused_tab, interface_config::show_app_title, disabled_tab_bar);
+    DrawTabBar({"Home", "Assignments", "Grades", "Calendar", "Settings"}, active_tab, focused_tab, interface_config::show_app_title, disabled_tab_bar);
     int indent_level = 0;
     for (const auto& text : texts) {
       move(text.y, text.x);

@@ -19,4 +19,5 @@ void SaveAssignmentsToDatabase(const std::vector<Assignment>& assignments);
 Assignment NewAssignment();
 void EditAssignment(Assignment& assignment);
 void AssignmentMenu(Assignment& assignment);
+void AssignmentMenu(Assignment* assignment);
 Tab Assignments();
