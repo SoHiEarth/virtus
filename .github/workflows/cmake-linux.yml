@@ -24,7 +24,7 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo apt update
-        sudo apt install -y libpugixml-dev
+        sudo apt install -y libpugixml-dev libncurses-dev
 
     - name: Configure CMake
       run: >
