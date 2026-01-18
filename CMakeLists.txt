@@ -15,4 +15,4 @@ target_sources(virtus PRIVATE
   src/calendar.cc
 )
 target_include_directories(virtus PRIVATE include)
-target_link_libraries(virtus PRIVATE Curses pugixml::pugixml)
+target_link_libraries(virtus PRIVATE Curses::Curses pugixml::pugixml)
