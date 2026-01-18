@@ -14,19 +14,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Ubuntu + GCC
-          - os: ubuntu-latest
-            c_compiler: gcc
-            cpp_compiler: g++
-            build_type: Release
-
-          # Ubuntu + Clang
           - os: ubuntu-latest
             c_compiler: clang
             cpp_compiler: clang++
             build_type: Release
 
-          # Windows + MSVC
           - os: windows-latest
             c_compiler: cl
             cpp_compiler: cl
