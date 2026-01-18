@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <sstream>
 #include <vector>
+#include "string.h"
 
 std::vector<Assignment> LoadAssignmentsFromDatabase() {
   std::vector<Assignment> assignments;
@@ -35,10 +36,10 @@ void SaveAssignmentsToDatabase(const std::vector<Assignment> &assignments) {
   for (const auto &assignment : assignments) {
     pugi::xml_node assignment_node =
         assignments_node.append_child("assignment");
-    assignment_node.append_child("name").text() = assignment.name;
-    assignment_node.append_child("class_name").text() = assignment.class_name;
-    assignment_node.append_child("description").text() = assignment.description;
-    assignment_node.append_child("due_date").text() = assignment.due_date;
+    assignment_node.append_child("name").text() = assignment.name.data();
+    assignment_node.append_child("class_name").text() = assignment.class_name.data();
+    assignment_node.append_child("description").text() = assignment.description.data();
+    assignment_node.append_child("due_date").text() = assignment.due_date.data();
     assignment_node.append_child("completed").text() = assignment.completed;
     assignment_node.append_child("score").text() = assignment.score;
     assignment_node.append_child("max_score").text() = assignment.max_score;
