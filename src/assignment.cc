@@ -2,7 +2,7 @@
 #include <iomanip>
 #include <sstream>
 #include <vector>
-#include "string.h"
+#include <cstring>
 #include <algorithm>
 
 std::vector<Assignment> LoadAssignmentsFromDatabase() {
@@ -69,7 +69,8 @@ Assignment NewAssignment() {
   refresh();
   getnstr(buffer, 255);
   // If not valid, try again
-  while (sscanf(buffer, "%d-%d-%d", new int, new int, new int) != 3) {
+  int year, month, day;
+  while (sscanf(buffer, "%d-%d-%d", &year, &month, &day) != 3) {
     printw("Invalid date format. Please use YYYY-MM-DD.\n");
     refresh();
     getnstr(buffer, 255);
@@ -95,7 +96,10 @@ void DrawPair(int x, const char *label, const char *value, bool highlight) {
   }
 }
 
-void AssignmentMenu(Assignment *assignment) { AssignmentMenu(*assignment); }
+void AssignmentMenu(Assignment *assignment) {
+  if (assignment)
+    AssignmentMenu(*assignment);
+}
 
 void AssignmentMenu(Assignment &assignment) {
   int button_index_x = 0;
@@ -179,7 +183,8 @@ void AssignmentMenu(Assignment &assignment) {
         char buffer[256];
         refresh();
         getnstr(buffer, 255);
-        while (sscanf(buffer, "%d-%d-%d", new int, new int, new int) != 3) {
+        int year, month, day;
+        while (sscanf(buffer, "%d-%d-%d", &year, &month, &day) != 3) {
           printw("Invalid date format. Please use YYYY-MM-DD.\n");
           refresh();
           getnstr(buffer, 255);
@@ -234,7 +239,7 @@ Tab Assignments() {
           style);
       std::ostringstream score_stream;
       score_stream << std::fixed << std::setprecision(2) << assignments[i].score
-                   << "% / " << assignments[i].max_score << "%";
+                   << "/" << assignments[i].max_score << "";
       interface.AddText(column += 30, line, "Score: " + score_stream.str(),
                         style);
       line++;

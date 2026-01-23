@@ -1,5 +1,6 @@
 #include "home.h"
 #include "assignment.h"
+#include "calculate.h"
 #include "interface.h"
 #include "settings.h"
 #include <format>
@@ -37,7 +38,7 @@ Tab Home() {
           std::format("Completed: {}", assignments[i].completed ? "Yes" : "No"),
           style);
       interface.AddText(column += 30, line,
-                        std::format("Score: {:.2f}%/{:.2f}%",
+                        std::format("Score: {:.2f}/{:.2f}",
                                     assignments[i].score,
                                     assignments[i].max_score),
                         style);
@@ -75,9 +76,7 @@ Tab Home() {
             "Overall Grade: {:.2f}%, GPA: {:.2f}",
             grade_count > 0 ? static_cast<double>(grade_sum) / grade_count
                             : 0.0,
-            (grade_count > 0 ? static_cast<double>(grade_sum) / grade_count
-                             : 0.0) /
-                20.0));
+            CalculateGPA(assignments)));
     interface.AddText(0, line++,
                       std::format("Completed Assignments: {}/{}", grade_count,
                                   static_cast<int>(assignments.size())));

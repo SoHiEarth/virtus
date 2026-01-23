@@ -8,39 +8,78 @@
 #include <ncurses.h>
 #include <pugixml.hpp>
 #include <string>
+#include <map>
 
 void InitialSetupPrompt() {
-  SetSubHeader("Initial Setup");
-  printw("Hello! Let's get started with setting up your profile.\n");
-  printw("Please enter your first name: ");
-  refresh();
-  user_settings::student_first_name.resize(256);
-  getnstr(user_settings::student_first_name.data(), 255);
-  user_settings::student_last_name.resize(256);
-  refresh();
-  printw("Please enter your last name: ");
-  getnstr(user_settings::student_last_name.data(), 255);
-  printw("Please enter your school name: ");
-  refresh();
-  user_settings::school_name.resize(256);
-  getnstr(user_settings::school_name.data(), 255);
-  while (user_settings::student_first_name.empty() ||
-         user_settings::student_last_name.empty() ||
-         user_settings::school_name.empty()) {
-    printw("All fields are required. Please try again.\n");
-    printw("First name: ");
-    refresh();
-    getstr(user_settings::student_first_name.data());
-    printw("Last name: ");
-    refresh();
-    getstr(user_settings::student_last_name.data());
-    printw("School name: ");
-    refresh();
-    getstr(user_settings::school_name.data());
+  std::map<std::string, std::string> inputs{
+    {"First Name", ""},
+    {"Last Name", ""},
+    {"School Name", ""}
+  };
+  int button_index_y = 0;
+  keypad(stdscr, TRUE);
+  while (true) {
+    Interface interface;
+    int line = 3;
+    interface.AddText(0, line++, "Initial Setup", HEADER);
+    interface.AddText(0, line++, "Welcome to Virtus. Let's set up your profile.", SUBHEADER);
+    int index = 0;
+    for (const auto &input : inputs) {
+      int style = NORMAL;
+      if (index == button_index_y) {
+        style |= REVERSE;
+      }
+      interface.AddText(0, line++, input.first + ": " + input.second, style);
+      index++;
+    }
+    int style = NORMAL;
+    if (button_index_y == index) {
+      style |= REVERSE;
+    }
+    interface.AddText(0, line++, "Finish", style | BOLD);
+    interface.Draw(0, -1, true);
+
+    auto ch = getch();
+    switch (ch) {
+      case KEY_UP:
+        if (button_index_y > 0) {
+          --button_index_y;
+        }
+        break;
+      case KEY_DOWN:
+        if (button_index_y < inputs.size()) {
+          ++button_index_y;
+        }
+        break;
+      case '\n':
+        if (button_index_y < inputs.size()) {
+          echo();
+          char input[100];
+          move(LINES - 1, 0);
+          clrtoeol();
+          mvprintw(LINES - 1, 0, "Enter %s: ",
+                    std::next(inputs.begin(), button_index_y)->first.c_str());
+          getnstr(input, 99);
+          noecho();
+          std::next(inputs.begin(), button_index_y)->second = std::string(input);
+        } else {
+          bool all_filled = true;
+          for (const auto &input : inputs) {
+            if (input.second.empty()) {
+              all_filled = false;
+              break;
+            }
+          }
+          if (all_filled) {
+            user_settings::student_first_name = inputs["First Name"];
+            user_settings::student_last_name = inputs["Last Name"];
+            user_settings::school_name = inputs["School Name"];
+            SaveUserSettings();
+            return;
+          }
+        }
+    }
   }
-  SaveUserSettings();
-  printw("Setup complete! Press any key to exit.");
-  refresh();
 }
 
 int main() {

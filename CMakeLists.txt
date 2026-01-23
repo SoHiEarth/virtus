@@ -18,6 +18,7 @@ add_executable(virtus)
 target_sources(virtus PRIVATE
   src/main.cc
   src/assignment.cc
+  src/calculate.cc
   src/interface.cc
   src/home.cc
   src/settings.cc
