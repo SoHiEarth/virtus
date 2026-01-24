@@ -12,7 +12,7 @@ void SetSubHeader(const char *subtitle) {
   attroff(A_BOLD | A_DIM);
 }
 
-void DrawTabBar(std::vector<std::string> tabs, int active_index,
+void DrawTabBar(std::vector<std::string> tabs, Tab active_tab,
                 int focused_index, bool show_app_title, bool disabled_tab_bar) {
   int width = getmaxx(stdscr);
   if (disabled_tab_bar) {
@@ -34,14 +34,14 @@ void DrawTabBar(std::vector<std::string> tabs, int active_index,
   }
   for (size_t i = 0; i < tabs.size(); ++i) {
     printw("|");
-    if (i == active_index) {
+    if (i == static_cast<int>(active_tab)) {
       attron(A_BOLD);
     }
     if (i == focused_index) {
       attron(A_REVERSE);
     }
     printw(" %s ", tabs[i].c_str());
-    if (i == active_index) {
+    if (i == static_cast<int>(active_tab)) {
       attroff(A_BOLD);
     }
     if (i == focused_index) {

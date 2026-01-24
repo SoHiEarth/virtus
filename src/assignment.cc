@@ -99,7 +99,7 @@ NewAssignmentResult NewAssignment() {
     interface.AddText(6, line, "[ Add Assignment ]", add_style);
     int cancel_style = (button_index_y == 7 && button_index_x == 1) ? REVERSE : NORMAL | BOLD;
     interface.AddText(30, line++, "[ Cancel ]", cancel_style);
-    interface.Draw(-1, -1, true);
+    interface.Draw(Tab::NONE, -1, true);
     auto ch = getch();
     if (ch == KEY_UP) {
       if (button_index_y > 0) {
@@ -244,7 +244,7 @@ void AssignmentMenu(Assignment &assignment) {
     interface.AddText(0, line++, "Actions", SUBHEADER);
     interface.AddText(6, line++, "[ Go Back ]",
                       button_index_x == 6 ? REVERSE : NORMAL);
-    interface.Draw(-1, -1, true);
+    interface.Draw(Tab::NONE, -1, true);
 
     auto ch = getch();
     if (ch == 'q' || ch == 'Q') {
@@ -321,7 +321,7 @@ void AssignmentMenu(Assignment &assignment) {
 
 Tab Assignments() {
   keypad(stdscr, TRUE);
-  int button_index_x = 1, button_index_y = 0;
+  int button_index_x = static_cast<int>(Tab::ASSIGNMENTS), button_index_y = 0;
   auto assignments = LoadAssignmentsFromDatabase();
   while (true) {
     Interface interface;
@@ -363,7 +363,7 @@ Tab Assignments() {
                         style);
       line++;
     }
-    interface.Draw(1, button_index_y == 0 ? button_index_x : -1);
+    interface.Draw(Tab::ASSIGNMENTS, button_index_y == 0 ? button_index_x : -1);
 
     auto ch = getch();
     switch (ch) {
@@ -385,7 +385,7 @@ Tab Assignments() {
       }
       break;
     case KEY_RIGHT:
-      if (button_index_y == 0 && button_index_x < 4) {
+      if (button_index_y == 0 && button_index_x < static_cast<int>(Tab::SETTINGS)) {
         ++button_index_x;
       }
       if (button_index_y == 1 && button_index_x < 2) {
@@ -394,13 +394,15 @@ Tab Assignments() {
       break;
     case '\n':
       if (button_index_y == 0) {
-        if (button_index_x == 0) {
+        if (button_index_x == static_cast<int>(Tab::HOME)) {
           return Tab::HOME;
-        } else if (button_index_x == 2) {
+        } else if (button_index_x == static_cast<int>(Tab::CLASSES)) {
+          return Tab::CLASSES;
+        } else if (button_index_x == static_cast<int>(Tab::GRADES)) {
           return Tab::GRADES;
-        } else if (button_index_x == 3) {
+        } else if (button_index_x == static_cast<int>(Tab::CALENDAR)) {
           return Tab::CALENDAR;
-        } else if (button_index_x == 4) {
+        } else if (button_index_x == static_cast<int>(Tab::SETTINGS)) {
           return Tab::SETTINGS;
         }
       } else if (button_index_y == 1) {

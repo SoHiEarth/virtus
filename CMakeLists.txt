@@ -17,6 +17,7 @@ find_package(pugixml REQUIRED)
 add_executable(virtus)
 target_sources(virtus PRIVATE
   src/main.cc
+  src/class.cc
   src/assignment.cc
   src/calculate.cc
   src/interface.cc

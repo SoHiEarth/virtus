@@ -97,7 +97,7 @@ struct Setting {
 
 Tab Settings() {
   keypad(stdscr, TRUE);
-  int button_index_x = 4, button_index_y = 0;
+  int button_index_x = 5, button_index_y = 0;
   std::vector<Setting> settings_list = {
     { SEPERATOR, "Assignment Settings"},
     SETTING_BOOL("Error Logging", settings::error_logging),
@@ -158,7 +158,7 @@ Tab Settings() {
                           setting.get_status(), style);
       }
     }
-    interface.Draw(4, button_index_y == 0 ? button_index_x : -1);
+    interface.Draw(Tab::SETTINGS, button_index_y == 0 ? button_index_x : -1);
 
     auto ch = getch();
     switch (ch) {
@@ -186,13 +186,15 @@ Tab Settings() {
       break;
     case '\n':
       if (button_index_y == 0) {
-        if (button_index_x == 0) {
+        if (button_index_x == static_cast<int>(Tab::HOME)) {
           return Tab::HOME;
-        } else if (button_index_x == 1) {
+        } else if (button_index_x == static_cast<int>(Tab::ASSIGNMENTS)) {
           return Tab::ASSIGNMENTS;
-        } else if (button_index_x == 2) {
+        } else if (button_index_x == static_cast<int>(Tab::CLASSES)) {
+          return Tab::CLASSES;
+        } else if (button_index_x == static_cast<int>(Tab::GRADES)) {
           return Tab::GRADES;
-        } else if (button_index_x == 3) {
+        } else if (button_index_x == static_cast<int>(Tab::CALENDAR)) {
           return Tab::CALENDAR;
         }
       } else {

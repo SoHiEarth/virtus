@@ -32,7 +32,7 @@ void onboard::Setup() {
       style |= REVERSE;
     }
     interface.AddText(0, line++, "Finish", style | BOLD);
-    interface.Draw(0, -1, true);
+    interface.Draw(Tab::NONE, -1, true);
 
     auto ch = getch();
     switch (ch) {
@@ -87,7 +87,7 @@ void onboard::Introduce() {
   interface.AddText(2, line++, "- Monitor your grades and performance");
   interface.AddText(2, line++, "- Manage your calendar");
   interface.AddText(0, line+=2, "Press any key to continue...", ITALIC);
-  interface.Draw(0, -1, true);
+  interface.Draw(Tab::NONE, -1, true);
   getch();
   Interface tab_interface;
   int tab_line = 3;
@@ -99,6 +99,6 @@ void onboard::Introduce() {
   tab_interface.AddText(2, tab_line++, "- Calendar: Manage your schedule");
   tab_interface.AddText(2, tab_line++, "- Settings: Customize your Virtus experience");
   tab_interface.AddText(0, tab_line+=2, "Press any key to finish the introduction...", ITALIC);
-  tab_interface.Draw(0, -1, true);
+  tab_interface.Draw(Tab::NONE, -1, true);
   getch();
 }

@@ -2,7 +2,15 @@
 #include <ncurses.h>
 #include <string>
 #include <vector>
-enum class Tab { HOME, ASSIGNMENTS, GRADES, CALENDAR, SETTINGS, NONE };
+enum class Tab : int {
+  HOME = 0,
+  ASSIGNMENTS,
+  CLASSES,
+  GRADES,
+  CALENDAR,
+  SETTINGS,
+  NONE
+};
 
 struct Button {
   const char *label;
@@ -39,7 +47,7 @@ struct TextObject {
 
 void SetHeader(const char *title);
 void SetSubHeader(const char *subtitle);
-void DrawTabBar(std::vector<std::string> tabs, int active_index,
+void DrawTabBar(std::vector<std::string> tabs, Tab active_tab,
                 int focused_index = 0, bool show_app_title = true,
                 bool disabled_tab_bar = false);
 
@@ -57,12 +65,13 @@ struct Interface {
     texts.push_back({x, y, std::string(content), style});
   }
 
-  void Draw(int active_tab = 0, int focused_tab = -1,
+  void Draw(Tab active_tab, int focused_tab = -1,
             bool disabled_tab_bar = false) {
     clear();
-    DrawTabBar({"Home", "Assignments", "Grades", "Calendar", "Settings"},
-               active_tab, focused_tab, interface_config::show_app_title,
-               disabled_tab_bar);
+    DrawTabBar(
+        {"Home", "Assignments", "Classes", "Grades", "Calendar", "Settings"},
+        active_tab, focused_tab, interface_config::show_app_title,
+        disabled_tab_bar);
     int indent_level = 0;
     for (const auto &text : texts) {
       move(text.y, text.x);

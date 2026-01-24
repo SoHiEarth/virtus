@@ -11,7 +11,7 @@ std::map<int, std::string> month_names = {
 
 Tab Calendar() {
   keypad(stdscr, TRUE);
-  int button_index_x = 3, button_index_y = 0;
+  int button_index_x = static_cast<int>(Tab::CALENDAR), button_index_y = 0;
   time_t t = time(nullptr);
   tm *now = localtime(&t);
 
@@ -53,7 +53,7 @@ Tab Calendar() {
                       std::format("Calendar (Year: {}, Month: {})", year,
                                   month_names.at(month)),
                       HEADER);
-    interface.Draw(3, button_index_y == 0 ? button_index_x : -1);
+    interface.Draw(Tab::CALENDAR, button_index_y == 0 ? button_index_x : -1);
     mvprintw(line++, interface_config::padding_left + 2,
              "Su       |Mo       |Tu       |We       |Th       |Fr       |Sa   "
              "     ");
@@ -108,13 +108,15 @@ Tab Calendar() {
     auto ch = getch();
     if (ch == '\n') {
       if (button_index_y == 0) {
-        if (button_index_x == 0) {
+        if (button_index_x == static_cast<int>(Tab::HOME)) {
           return Tab::HOME;
-        } else if (button_index_x == 1) {
+        } else if (button_index_x == static_cast<int>(Tab::ASSIGNMENTS)) {
           return Tab::ASSIGNMENTS;
-        } else if (button_index_x == 2) {
+        } else if (button_index_x == static_cast<int>(Tab::CLASSES)) {
+          return Tab::CLASSES;
+        } else if (button_index_x == static_cast<int>(Tab::GRADES)) {
           return Tab::GRADES;
-        } else if (button_index_x == 4) {
+        } else if (button_index_x == static_cast<int>(Tab::SETTINGS)) {
           return Tab::SETTINGS;
         }
       } else {
@@ -133,7 +135,7 @@ Tab Calendar() {
         --button_index_x;
       }
     } else if (ch == KEY_RIGHT) {
-      if (button_index_x < 4) {
+      if (button_index_x < static_cast<int>(Tab::SETTINGS)) {
         ++button_index_x;
       }
     } else if (ch == KEY_UP) {

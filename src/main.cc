@@ -8,6 +8,7 @@
 #include <ncurses.h>
 #include <pugixml.hpp>
 #include "onboarding.h"
+#include "class.h"
 
 int main() {
   initscr();
@@ -35,6 +36,9 @@ int main() {
       break;
     case Tab::ASSIGNMENTS:
       current_tab = Assignments();
+      break;
+    case Tab::CLASSES:
+      current_tab = Classes();
       break;
     case Tab::GRADES:
       current_tab = Grades();

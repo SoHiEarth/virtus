@@ -7,7 +7,7 @@
 
 Tab Grades() {
   keypad(stdscr, TRUE);
-  int button_index_x = 2, button_index_y = 0;
+  int button_index_x = 3, button_index_y = 0;
   auto assignments = LoadAssignmentsFromDatabase();
   while (true) {
     Interface interface;
@@ -101,7 +101,7 @@ Tab Grades() {
                       std::format("Completed Assignments: {}/{}", grade_count,
                                   static_cast<int>(assignments.size())));
 
-    interface.Draw(2, button_index_y == 0 ? button_index_x : -1);
+    interface.Draw(Tab::GRADES, button_index_y == 0 ? button_index_x : -1);
     auto ch = getch();
     switch (ch) {
     case KEY_UP:
@@ -121,13 +121,15 @@ Tab Grades() {
       }
       break;
     case '\n':
-      if (button_index_x == 0) {
+      if (button_index_x == static_cast<int>(Tab::HOME)) {
         return Tab::HOME;
-      } else if (button_index_x == 1) {
+      } else if (button_index_x == static_cast<int>(Tab::ASSIGNMENTS)) {
         return Tab::ASSIGNMENTS;
-      } else if (button_index_x == 3) {
+      } else if (button_index_x == static_cast<int>(Tab::CLASSES)) {
+        return Tab::CLASSES;
+      } else if (button_index_x == static_cast<int>(Tab::CALENDAR)) {
         return Tab::CALENDAR;
-      } else if (button_index_x == 4) {
+      } else if (button_index_x == static_cast<int>(Tab::SETTINGS)) {
         return Tab::SETTINGS;
       }
       break;

@@ -80,18 +80,20 @@ Tab Home() {
     interface.AddText(0, line++,
                       std::format("Completed Assignments: {}/{}", grade_count,
                                   static_cast<int>(assignments.size())));
-    interface.Draw(0, button_index_y == 0 ? button_index_x : -1);
+    interface.Draw(Tab::HOME, button_index_y == 0 ? button_index_x : -1);
 
     auto ch = getch();
     if (ch == '\n') {
       if (button_index_y == 0) {
-        if (button_index_x == 1) {
+        if (button_index_x == static_cast<int>(Tab::ASSIGNMENTS)) {
           return Tab::ASSIGNMENTS;
-        } else if (button_index_x == 2) {
+        } else if (button_index_x == static_cast<int>(Tab::CLASSES)) {
+          return Tab::CLASSES;
+        } else if (button_index_x == static_cast<int>(Tab::GRADES)) {
           return Tab::GRADES;
-        } else if (button_index_x == 3) {
+        } else if (button_index_x == static_cast<int>(Tab::CALENDAR)) {
           return Tab::CALENDAR;
-        } else if (button_index_x == 4) {
+        } else if (button_index_x == static_cast<int>(Tab::SETTINGS)) {
           return Tab::SETTINGS;
         }
       } else if (button_index_y - 1 < std::min((int)assignments.size(), 5)) {
@@ -129,7 +131,7 @@ Tab Home() {
         --button_index_x;
       }
     } else if (ch == KEY_RIGHT) {
-      if (button_index_x < 4) {
+      if (button_index_x < (static_cast<int>(Tab::SETTINGS))) {
         ++button_index_x;
       }
     }
