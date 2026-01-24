@@ -17,7 +17,7 @@ double CalculateGPA(const std::vector<Assignment> &assignments,
         }
         total += assignment.score;
       }
-      return total / assignments.size();
+      return std::clamp(total / assignments.size() / 20, 0.0, 5.0);
     }
     case INTERNATIONAL_BACCALAUREATE: {
       std::vector<double> ib_scores;
@@ -31,7 +31,7 @@ double CalculateGPA(const std::vector<Assignment> &assignments,
       for (const auto &score : ib_scores) {
         total += score;
       }
-      return total / ib_scores.size();
+      return std::clamp(total / ib_scores.size(), 0.0, 7.0);
     }
   }
   return 0;

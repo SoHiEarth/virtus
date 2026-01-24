@@ -99,9 +99,11 @@ Tab Home() {
         SaveAssignmentsToDatabase(assignments);
       } else if (button_index_y - 1 == std::min((int)assignments.size(), 5)) {
         if (button_index_x == 0) {
-          Assignment new_assignment = NewAssignment();
-          assignments.push_back(new_assignment);
-          SaveAssignmentsToDatabase(assignments);
+          auto res = NewAssignment();
+          if (!res.canceled) {
+            assignments.push_back(res.assignment);
+            SaveAssignmentsToDatabase(assignments);
+          }
         } else {
           assignments = LoadAssignmentsFromDatabase();
           if (!assignments.empty()) {

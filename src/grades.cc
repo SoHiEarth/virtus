@@ -52,7 +52,7 @@ Tab Grades() {
     interface.AddText(0, line++, "Overall GPA", HEADER);
     interface.AddText(
         0, line++,
-        std::format("GPA: {:.2f}", CalculateGPA(assignments)));
+        std::format("Overall GPA: {:.2f}", CalculateGPA(assignments)));
     
     interface.AddText(0, line++, "Overall GPA Breakdown by Class", SUBHEADER);
     for (const auto &[class_name, grades] : class_grades) {
@@ -90,6 +90,10 @@ Tab Grades() {
           line++;
         }
       }
+    }
+    if (classes.empty()) {
+      interface.AddText(0, line++, "No completed assignments to show contribution.",
+                        NORMAL | ITALIC);
     }
 
     interface.AddText(0, line++, "Information", HEADER);

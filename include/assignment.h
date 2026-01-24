@@ -16,7 +16,12 @@ struct Assignment {
 
 std::vector<Assignment> LoadAssignmentsFromDatabase();
 void SaveAssignmentsToDatabase(const std::vector<Assignment> &assignments);
-Assignment NewAssignment();
+
+struct NewAssignmentResult {
+  bool canceled;
+  Assignment assignment;
+};
+NewAssignmentResult NewAssignment();
 void EditAssignment(Assignment &assignment);
 void AssignmentMenu(Assignment &assignment);
 void AssignmentMenu(Assignment *assignment);

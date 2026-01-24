@@ -23,6 +23,7 @@ target_sources(virtus PRIVATE
   src/home.cc
   src/settings.cc
   src/grades.cc
+  src/onboarding.cc
   src/calendar.cc
 )
 target_include_directories(virtus PRIVATE include)
