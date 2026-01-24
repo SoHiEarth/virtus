@@ -74,8 +74,7 @@ Tab Home() {
         0, line++,
         std::format(
             "Overall Grade: {:.2f}%, GPA: {:.2f}",
-            grade_count > 0 ? static_cast<double>(grade_sum) / grade_count
-                            : 0.0,
+            CalculateGrade(assignments),
             CalculateGPA(assignments)));
     interface.AddText(0, line++,
                       std::format("Completed Assignments: {}/{}", grade_count,

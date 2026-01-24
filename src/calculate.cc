@@ -36,3 +36,18 @@ double CalculateGPA(const std::vector<Assignment> &assignments,
   }
   return 0;
 }
+
+double CalculateGrade(const std::vector<Assignment> &assignments,
+                       std::string class_name) {
+  if (assignments.empty()) return 0;
+  double total = 0;
+  int count = 0;
+  for (const auto &assignment : assignments) {
+    if (!class_name.empty() && assignment.class_name != class_name) {
+      continue;
+    }
+    total += assignment.score;
+    count++;
+  }
+  return count == 0 ? 0 : total / count;
+}
