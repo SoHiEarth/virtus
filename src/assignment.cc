@@ -138,6 +138,13 @@ NewAssignmentResult NewAssignment() {
             std::string due_date = GetUserInput("Enter Due Date (YYYY-MM-DD)");
             int year, month, day;
             if (sscanf(due_date.c_str(), "%d-%d-%d", &year, &month, &day) == 3) {
+              // Check if date is valid
+              if (month < 1 || month > 12 || day < 1 || day > 31) {
+                mvprintw(LINES - 1, 0, "Invalid date. Please enter a valid date.\n");
+                refresh();
+                getch();
+                continue;
+              }
               assignment.due_date = due_date;
               break;
             } else {
@@ -421,7 +428,7 @@ Tab Assignments() {
           assignments = LoadAssignmentsFromDatabase();
         }
       } else if (button_index_y - 2 < static_cast<int>(assignments.size())) {
-        AssignmentMenu(assignments[button_index_y - 1]);
+        AssignmentMenu(assignments[button_index_y - 2]);
         SaveAssignmentsToDatabase(assignments);
       }
       break;

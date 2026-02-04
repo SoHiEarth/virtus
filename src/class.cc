@@ -19,8 +19,8 @@ Tab Classes() {
     interface.AddText(0, line++, "Your Classes", HEADER);
     for (const auto& [class_name, class_assignments] : all_class_assignments) {
       interface.AddText(0, line++, class_name, SUBHEADER);
-      interface.AddText(0, line++, "Grade: " + std::format("{:.2f}", CalculateGPA(assignments, class_name)), NORMAL);
-      interface.AddText(0, line++, "GPA: " + std::format("{:.2f}", CalculateGrade(assignments, class_name)), NORMAL);
+      interface.AddText(0, line++, "Grade: " + std::format("{:.2f}", CalculateGrade(assignments, class_name)), NORMAL);
+      interface.AddText(0, line++, "GPA: " + std::format("{:.2f}", CalculateGPA(assignments, class_name)), NORMAL);
       if (assignments.empty()) {
         interface.AddText(4, line++, "No assignments found.", NORMAL);
       } else {
