@@ -14,8 +14,13 @@ int main() {
   initscr();
   clear();
   if (!std::filesystem::exists("user_settings.xml")) {
+    try {
     onboard::Setup();
     onboard::Introduce();
+    } catch (const std::exception &e) {
+      endwin();
+      return 1;
+    }
   } else {
     try {
       LoadUserSettings();
@@ -24,8 +29,13 @@ int main() {
       printw("Starting initial setup...\n");
       refresh();
       getch();
-      onboard::Setup();
-      onboard::Introduce();
+      try {
+        onboard::Setup();
+        onboard::Introduce();
+      } catch (const std::exception &e) {
+        endwin();
+        return 1;
+      }
     }
   }
   Tab current_tab = Tab::HOME;

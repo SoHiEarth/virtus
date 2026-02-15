@@ -4,6 +4,7 @@
 #include <map>
 #include <ncurses.h>
 #include <string>
+#include <stdexcept>
 
 void onboard::Setup() {
   std::map<std::string, std::string> inputs{
@@ -46,6 +47,8 @@ void onboard::Setup() {
           ++button_index_y;
         }
         break;
+      case 'q':
+        throw std::runtime_error("User exited onboarding");
       case '\n':
         if (button_index_y < inputs.size()) {
           echo();
@@ -88,7 +91,13 @@ void onboard::Introduce() {
   interface.AddText(2, line++, "- Manage your calendar");
   interface.AddText(0, line+=2, "Press any key to continue...", ITALIC);
   interface.Draw(Tab::NONE, -1, true);
-  getch();
+  auto ch = getch();
+  switch (ch) {
+    case 'q':
+      throw std::runtime_error("User exited onboarding");
+    default:
+      break;
+  }
   Interface tab_interface;
   int tab_line = 3;
   tab_interface.AddText(0, tab_line++, "Tabs", HEADER);
@@ -100,5 +109,11 @@ void onboard::Introduce() {
   tab_interface.AddText(2, tab_line++, "- Settings: Customize your Virtus experience");
   tab_interface.AddText(0, tab_line+=2, "Press any key to finish the introduction...", ITALIC);
   tab_interface.Draw(Tab::NONE, -1, true);
-  getch();
+  auto ch2 = getch();
+  switch (ch2) {
+    case 'q':
+      throw std::runtime_error("User exited onboarding");
+    default:
+      break;
+  }
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 #include <vector>
 
 enum Method { AVERAGE, INTERNATIONAL_BACCALAUREATE };

@@ -2,6 +2,7 @@
 #include "interface.h"
 #include "calculate.h"
 #include <filesystem>
+#include <cstring>
 #include <functional>
 #include <pugixml.hpp>
 

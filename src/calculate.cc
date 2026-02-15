@@ -1,5 +1,6 @@
 #include "calculate.h"
 #include "assignment.h"
+#include <algorithm>
 
 namespace user_settings {
 Method gpa_calculation_method = AVERAGE;
