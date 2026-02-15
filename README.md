@@ -26,3 +26,33 @@ Virtus is a school assignment manager and grade tracker, helping you manage your
 ### Finally, Calendar
 ![Calendar Preview](assets/preview_calendar.png)
 **A simple calendar that lets you know of your recent assignments and their proximity to the current date.**
+
+## Installation
+### Download & Run
+1. Download the latest release from the [releases page](https://github.com/sohiearth/virtus/releases).
+2. Add permissions to execute the file:
+   ```bash
+   chmod +x virtus
+   ```
+3. Run the application:
+    ```bash
+    ./virtus
+    ```
+
+### Build from Source
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/sohiearth/virtus.git
+    cd virtus
+    ```
+2. Build the app using CMake:
+    ```bash
+    mkdir build
+    cd build
+    cmake ..
+    cmake --build .
+    ```
+3. Run the application:
+    ```bash
+    ./virtus
+    ```
