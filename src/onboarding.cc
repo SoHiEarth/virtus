@@ -17,24 +17,24 @@ void onboard::Setup() {
   while (true) {
     Interface interface;
     int line = 3;
-    interface.AddText(0, line++, "Initial Setup", HEADER);
+    interface.AddText(0, line++, "Initial Setup", kHeader);
     interface.AddText(
-        0, line++, "Welcome to Virtus. Let's set up your profile.", SUBHEADER);
+        0, line++, "Welcome to Virtus. Let's set up your profile.", kSubheader);
     int index = 0;
     for (const auto& input : inputs) {
-      int style = NORMAL;
+      int style = kNormal;
       if (index == button_index_y) {
-        style |= REVERSE;
+        style |= kReverse;
       }
       interface.AddText(0, line++, input.first + ": " + input.second, style);
       index++;
     }
-    int style = NORMAL;
+    int style = kNormal;
     if (button_index_y == index) {
-      style |= REVERSE;
+      style |= kReverse;
     }
-    interface.AddText(0, line++, "Finish", style | BOLD);
-    interface.Draw(Tab::NONE, -1, true);
+    interface.AddText(0, line++, "Finish", style | kBold);
+    interface.Draw(Tab::kNone, -1, true);
 
     auto ch = getch();
     switch (ch) {
@@ -85,16 +85,16 @@ void onboard::Setup() {
 void onboard::Introduce() {
   Interface interface;
   int line = 3;
-  interface.AddText(0, line++, "Welcome to Virtus!", HEADER);
+  interface.AddText(0, line++, "Welcome to Virtus!", kHeader);
   interface.AddText(0, line++,
                     "Virtus is your all-in-one academic management tool.",
-                    SUBHEADER);
+                    kSubheader);
   interface.AddText(0, line++, "With Virtus, you can:");
   interface.AddText(2, line++, "- Track assignments and due dates");
   interface.AddText(2, line++, "- Monitor your grades and performance");
   interface.AddText(2, line++, "- Manage your calendar");
-  interface.AddText(0, line += 2, "Press any key to continue...", ITALIC);
-  interface.Draw(Tab::NONE, -1, true);
+  interface.AddText(0, line += 2, "Press any key to continue...", kItalic);
+  interface.Draw(Tab::kNone, -1, true);
   auto ch = getch();
   switch (ch) {
     case 'q':
@@ -104,11 +104,11 @@ void onboard::Introduce() {
   }
   Interface tab_interface;
   int tab_line = 3;
-  tab_interface.AddText(0, tab_line++, "Tabs", HEADER);
+  tab_interface.AddText(0, tab_line++, "Tabs", kHeader);
   tab_interface.AddText(
       0, tab_line++,
       "Above is the tab bar. Use it to navigate between different sections:",
-      SUBHEADER);
+      kSubheader);
   tab_interface.AddText(2, tab_line++,
                         "- Home: Overview of your academic status");
   tab_interface.AddText(2, tab_line++,
@@ -119,8 +119,8 @@ void onboard::Introduce() {
   tab_interface.AddText(2, tab_line++,
                         "- Settings: Customize your Virtus experience");
   tab_interface.AddText(0, tab_line += 2,
-                        "Press any key to finish the introduction...", ITALIC);
-  tab_interface.Draw(Tab::NONE, -1, true);
+                        "Press any key to finish the introduction...", kItalic);
+  tab_interface.Draw(Tab::kNone, -1, true);
   auto ch2 = getch();
   switch (ch2) {
     case 'q':

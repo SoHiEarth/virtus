@@ -1,5 +1,7 @@
 #include "interface.h"
 
+#include <utility>
+
 void SetHeader(const char* title) {
   attron(A_BOLD);
   printw("%s\n", title);
@@ -34,17 +36,17 @@ void DrawTabBar(std::vector<std::string> tabs, Tab active_tab,
   }
   for (size_t i = 0; i < tabs.size(); ++i) {
     printw("|");
-    if (i == static_cast<int>(active_tab)) {
+    if (static_cast<Tab>(i) == active_tab) {
       attron(A_BOLD);
     }
-    if (i == focused_index) {
+    if (std::cmp_equal(i, focused_index)) {
       attron(A_REVERSE);
     }
     printw(" %s ", tabs[i].c_str());
-    if (i == static_cast<int>(active_tab)) {
+    if (static_cast<Tab>(i) == active_tab) {
       attroff(A_BOLD);
     }
-    if (i == focused_index) {
+    if (std::cmp_equal(i, focused_index)) {
       attroff(A_REVERSE);
     }
   }

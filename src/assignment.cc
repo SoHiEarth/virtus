@@ -4,10 +4,12 @@
 #include <cstring>
 #include <iomanip>
 #include <sstream>
+#include <utility>
 #include <vector>
 
 #include "interface.h"
 
+namespace {
 std::string GetUserInput(const std::string& prompt) {
   echo();
   char input[256];
@@ -18,6 +20,18 @@ std::string GetUserInput(const std::string& prompt) {
   clrtoeol();
   return std::string(input);
 }
+
+void DrawPair(int x, const char* label, const char* value, bool highlight) {
+  if (highlight) {
+    attron(A_REVERSE);
+  }
+  mvprintw(x, 6, "%s", label);
+  mvprintw(x, 20, "%s\n", value);
+  if (highlight) {
+    attroff(A_REVERSE);
+  }
+}
+}  // namespace
 
 std::vector<Assignment> LoadAssignmentsFromDatabase() {
   std::vector<Assignment> assignments;
@@ -73,54 +87,56 @@ NewAssignmentResult NewAssignment() {
   while (true) {
     Interface interface;
     int line = interface_config::simple_tab_bar ? 1 : 3;
-    interface.AddText(0, line++, "Add New Assignment", HEADER);
-    int name_style = button_index_y == 0 ? REVERSE : NORMAL | BOLD;
+    interface.AddText(0, line++, "Add New Assignment", kHeader);
+    int name_style = button_index_y == 0 ? kReverse : kNormal | kBold;
     interface.AddText(0, line, "Assignment Name", name_style);
     interface.AddText(30, line++,
                       assignment.name.empty() ? "<Not Set>" : assignment.name,
-                      name_style & ~BOLD);
-    int class_style = button_index_y == 1 ? REVERSE : NORMAL | BOLD;
+                      name_style & ~kBold);
+    int class_style = button_index_y == 1 ? kReverse : kNormal | kBold;
     interface.AddText(0, line, "Class Name", class_style);
     interface.AddText(
         30, line++,
         assignment.class_name.empty() ? "<Not Set>" : assignment.class_name,
-        class_style & ~BOLD);
-    int desc_style = button_index_y == 2 ? REVERSE : NORMAL | BOLD;
+        class_style & ~kBold);
+    int desc_style = button_index_y == 2 ? kReverse : kNormal | kBold;
     interface.AddText(0, line, "Description", desc_style);
     interface.AddText(
         30, line++,
         assignment.description.empty() ? "<Not Set>" : assignment.description,
-        desc_style & ~BOLD);
+        desc_style & ~kBold);
 
-    int due_style = button_index_y == 3 ? REVERSE : NORMAL | BOLD;
+    int due_style = button_index_y == 3 ? kReverse : kNormal | kBold;
     interface.AddText(0, line, "Due Date (YYYY-MM-DD)", due_style);
     interface.AddText(
         30, line++,
         assignment.due_date.empty() ? "<Not Set>" : assignment.due_date,
-        due_style & ~BOLD);
+        due_style & ~kBold);
 
-    int completed_style = button_index_y == 4 ? REVERSE : NORMAL | BOLD;
+    int completed_style = button_index_y == 4 ? kReverse : kNormal | kBold;
     interface.AddText(0, line, "Completed", completed_style);
     interface.AddText(30, line++, assignment.completed ? "Yes" : "No",
-                      completed_style & ~BOLD);
+                      completed_style & ~kBold);
 
-    int score_style = button_index_y == 5 ? REVERSE : NORMAL | BOLD;
+    int score_style = button_index_y == 5 ? kReverse : kNormal | kBold;
     interface.AddText(0, line, "Score", score_style);
     interface.AddText(30, line++, std::to_string(assignment.score),
-                      score_style & ~BOLD);
+                      score_style & ~kBold);
 
-    int max_score_style = button_index_y == 6 ? REVERSE : NORMAL | BOLD;
+    int max_score_style = button_index_y == 6 ? kReverse : kNormal | kBold;
     interface.AddText(0, line, "Max Score", max_score_style);
     interface.AddText(30, line++, std::to_string(assignment.max_score),
-                      max_score_style & ~BOLD);
-    interface.AddText(0, line++, "Actions", SUBHEADER);
-    int add_style =
-        (button_index_y == 7 && button_index_x == 0) ? REVERSE : NORMAL | BOLD;
+                      max_score_style & ~kBold);
+    interface.AddText(0, line++, "Actions", kSubheader);
+    int add_style = (button_index_y == 7 && button_index_x == 0)
+                        ? kReverse
+                        : kNormal | kBold;
     interface.AddText(6, line, "[ Add Assignment ]", add_style);
-    int cancel_style =
-        (button_index_y == 7 && button_index_x == 1) ? REVERSE : NORMAL | BOLD;
+    int cancel_style = (button_index_y == 7 && button_index_x == 1)
+                           ? kReverse
+                           : kNormal | kBold;
     interface.AddText(30, line++, "[ Cancel ]", cancel_style);
-    interface.Draw(Tab::NONE, -1, true);
+    interface.Draw(Tab::kNone, -1, true);
     auto ch = getch();
     if (ch == KEY_UP) {
       if (button_index_y > 0) {
@@ -139,7 +155,7 @@ NewAssignmentResult NewAssignment() {
         ++button_index_x;
       }
     } else if (ch == 'q' || ch == 'Q') {
-      return {true, Assignment()};
+      return {.canceled = true, .assignment = Assignment()};
     } else if (ch == '\n') {
       switch (button_index_y) {
         case 0: {  // Assignment Name
@@ -157,7 +173,9 @@ NewAssignmentResult NewAssignment() {
         case 3: {  // Due Date
           while (true) {
             std::string due_date = GetUserInput("Enter Due Date (YYYY-MM-DD)");
-            int year, month, day;
+            int year;
+            int month;
+            int day;
             if (sscanf(due_date.c_str(), "%d-%d-%d", &year, &month, &day) ==
                 3) {
               // Check if date is valid
@@ -170,12 +188,11 @@ NewAssignmentResult NewAssignment() {
               }
               assignment.due_date = due_date;
               break;
-            } else {
-              mvprintw(LINES - 1, 0,
-                       "Invalid date format. Please use YYYY-MM-DD.\n");
-              refresh();
-              getch();
             }
+            mvprintw(LINES - 1, 0,
+                     "Invalid date format. Please use YYYY-MM-DD.\n");
+            refresh();
+            getch();
           }
           break;
         }
@@ -221,26 +238,17 @@ NewAssignmentResult NewAssignment() {
               refresh();
               getch();
             } else {
-              return {false, assignment};
+              return {.canceled = false, .assignment = assignment};
             }
           } else {  // Cancel
-            return {true, Assignment()};
+            return {.canceled = true, .assignment = Assignment()};
           }
           break;
         }
+        default:
+          break;
       }
     }
-  }
-}
-
-void DrawPair(int x, const char* label, const char* value, bool highlight) {
-  if (highlight) {
-    attron(A_REVERSE);
-  }
-  mvprintw(x, 6, "%s", label);
-  mvprintw(x, 20, "%s\n", value);
-  if (highlight) {
-    attroff(A_REVERSE);
   }
 }
 
@@ -255,44 +263,45 @@ void AssignmentMenu(Assignment& assignment) {
   while (true) {
     Interface interface;
     int line = interface_config::simple_tab_bar ? 1 : 3;
-    interface.AddText(0, line++, assignment.name, HEADER);
-    interface.AddText(1, line++, "Assignment Info", SUBHEADER);
+    interface.AddText(0, line++, assignment.name, kHeader);
+    interface.AddText(1, line++, "Assignment Info", kSubheader);
     interface.AddText(0, line, "Name",
-                      button_index_x == 0 ? REVERSE : NORMAL | BOLD);
+                      button_index_x == 0 ? kReverse : kNormal | kBold);
     interface.AddText(30, line++, assignment.name,
-                      button_index_x == 0 ? REVERSE : NORMAL);
+                      button_index_x == 0 ? kReverse : kNormal);
     interface.AddText(0, line, "Class",
-                      button_index_x == 1 ? REVERSE : NORMAL | BOLD);
+                      button_index_x == 1 ? kReverse : kNormal | kBold);
     interface.AddText(30, line++, assignment.class_name,
-                      button_index_x == 1 ? REVERSE : NORMAL);
+                      button_index_x == 1 ? kReverse : kNormal);
     interface.AddText(0, line, "Description",
-                      button_index_x == 2 ? REVERSE : NORMAL | BOLD);
+                      button_index_x == 2 ? kReverse : kNormal | kBold);
     interface.AddText(30, line++, assignment.description,
-                      button_index_x == 2 ? REVERSE : NORMAL);
+                      button_index_x == 2 ? kReverse : kNormal);
     interface.AddText(0, line, "Due Date",
-                      button_index_x == 3 ? REVERSE : NORMAL | BOLD);
+                      button_index_x == 3 ? kReverse : kNormal | kBold);
     interface.AddText(30, line++, assignment.due_date,
-                      button_index_x == 3 ? REVERSE : NORMAL);
+                      button_index_x == 3 ? kReverse : kNormal);
     interface.AddText(0, line, "Completed",
-                      button_index_x == 4 ? REVERSE : NORMAL | BOLD);
+                      button_index_x == 4 ? kReverse : kNormal | kBold);
     interface.AddText(30, line++, assignment.completed ? "Yes" : "No",
-                      button_index_x == 4 ? REVERSE : NORMAL);
+                      button_index_x == 4 ? kReverse : kNormal);
     interface.AddText(0, line, "Score",
-                      button_index_x == 5 ? REVERSE : NORMAL | BOLD);
+                      button_index_x == 5 ? kReverse : kNormal | kBold);
     std::ostringstream score_stream;
     score_stream << std::fixed << std::setprecision(2) << assignment.score
                  << "% / " << assignment.max_score << "%";
     interface.AddText(30, line++, score_stream.str(),
-                      button_index_x == 5 ? REVERSE : NORMAL);
-    interface.AddText(0, line++, "Actions", SUBHEADER);
+                      button_index_x == 5 ? kReverse : kNormal);
+    interface.AddText(0, line++, "Actions", kSubheader);
     interface.AddText(6, line++, "[ Go Back ]",
-                      button_index_x == 6 ? REVERSE : NORMAL);
-    interface.Draw(Tab::NONE, -1, true);
+                      button_index_x == 6 ? kReverse : kNormal);
+    interface.Draw(Tab::kNone, -1, true);
 
     auto ch = getch();
     if (ch == 'q' || ch == 'Q') {
       return;
-    } else if (ch == KEY_UP) {
+    }
+    if (ch == KEY_UP) {
       if (button_index_x > 0) {
         --button_index_x;
       }
@@ -331,7 +340,9 @@ void AssignmentMenu(Assignment& assignment) {
           char buffer[256];
           refresh();
           getnstr(buffer, 255);
-          int year, month, day;
+          int year;
+          int month;
+          int day;
           while (sscanf(buffer, "%d-%d-%d", &year, &month, &day) != 3) {
             printw("Invalid date format. Please use YYYY-MM-DD.\n");
             refresh();
@@ -349,12 +360,14 @@ void AssignmentMenu(Assignment& assignment) {
           char buffer[256];
           refresh();
           getnstr(buffer, 255);
-          assignment.score = atof(buffer);
+          char* endptr;
+          assignment.score = strtod(buffer, &endptr);
           assignment.score =
-              std::clamp(assignment.score, 0.0f, assignment.max_score);
+              std::clamp(assignment.score, 0.0F, assignment.max_score);
           break;
         }
         case 6:  // Go Back
+        default:
           return;
       }
     }
@@ -364,30 +377,31 @@ void AssignmentMenu(Assignment& assignment) {
 
 Tab Assignments() {
   keypad(stdscr, TRUE);
-  int button_index_x = static_cast<int>(Tab::ASSIGNMENTS), button_index_y = 0;
+  int button_index_x = static_cast<int>(Tab::kAssignments);
+  int button_index_y = 0;
   auto assignments = LoadAssignmentsFromDatabase();
   while (true) {
     Interface interface;
     int line = interface_config::simple_tab_bar ? 1 : 3;
-    interface.AddText(0, line++, "All Assignments", HEADER);
-    interface.AddText(0, line++, "Actions", SUBHEADER);
+    interface.AddText(0, line++, "All Assignments", kHeader);
+    interface.AddText(0, line++, "Actions", kSubheader);
     interface.AddText(
         6, line, "[ New Assignment ]",
-        (button_index_y == 1 && button_index_x == 0) ? REVERSE : NORMAL);
+        (button_index_y == 1 && button_index_x == 0) ? kReverse : kNormal);
     interface.AddText(
         30, line, "[ Remove Assignment ]",
-        (button_index_y == 1 && button_index_x == 1) ? REVERSE : NORMAL);
+        (button_index_y == 1 && button_index_x == 1) ? kReverse : kNormal);
     interface.AddText(
         60, line++, "[ Refresh List ]",
-        (button_index_y == 1 && button_index_x == 2) ? REVERSE : NORMAL);
-    interface.AddText(0, line++, "Assignments", SUBHEADER);
+        (button_index_y == 1 && button_index_x == 2) ? kReverse : kNormal);
+    interface.AddText(0, line++, "Assignments", kSubheader);
     for (size_t i = 0; i < assignments.size(); ++i) {
-      int style = NORMAL;
-      if (i == button_index_y - 2) {
-        style = REVERSE;
+      int style = kNormal;
+      if (std::cmp_equal(i, button_index_y - 2)) {
+        style = kReverse;
       }
       int column = 0;
-      interface.AddText(column, line, assignments[i].name, style | BOLD);
+      interface.AddText(column, line, assignments[i].name, style | kBold);
       interface.AddText(column += 30, line,
                         "Class: " + assignments[i].class_name, style);
       interface.AddText(column += 30, line, "Due: " + assignments[i].due_date,
@@ -403,7 +417,12 @@ Tab Assignments() {
                         style);
       line++;
     }
-    interface.Draw(Tab::ASSIGNMENTS, button_index_y == 0 ? button_index_x : -1);
+
+    if (assignments.empty()) {
+      interface.AddText(0, line++, "No assignments found. Add one!");
+    }
+    interface.Draw(Tab::kAssignments,
+                   button_index_y == 0 ? button_index_x : -1);
 
     auto ch = getch();
     switch (ch) {
@@ -426,7 +445,7 @@ Tab Assignments() {
         break;
       case KEY_RIGHT:
         if (button_index_y == 0 &&
-            button_index_x < static_cast<int>(Tab::SETTINGS)) {
+            button_index_x < static_cast<int>(Tab::kSettings)) {
           ++button_index_x;
         }
         if (button_index_y == 1 && button_index_x < 2) {
@@ -435,16 +454,20 @@ Tab Assignments() {
         break;
       case '\n':
         if (button_index_y == 0) {
-          if (button_index_x == static_cast<int>(Tab::HOME)) {
-            return Tab::HOME;
-          } else if (button_index_x == static_cast<int>(Tab::CLASSES)) {
-            return Tab::CLASSES;
-          } else if (button_index_x == static_cast<int>(Tab::GRADES)) {
-            return Tab::GRADES;
-          } else if (button_index_x == static_cast<int>(Tab::CALENDAR)) {
-            return Tab::CALENDAR;
-          } else if (button_index_x == static_cast<int>(Tab::SETTINGS)) {
-            return Tab::SETTINGS;
+          if (button_index_x == static_cast<int>(Tab::kHome)) {
+            return Tab::kHome;
+          }
+          if (button_index_x == static_cast<int>(Tab::kClasses)) {
+            return Tab::kClasses;
+          }
+          if (button_index_x == static_cast<int>(Tab::kGrades)) {
+            return Tab::kGrades;
+          }
+          if (button_index_x == static_cast<int>(Tab::kCalendar)) {
+            return Tab::kCalendar;
+          }
+          if (button_index_x == static_cast<int>(Tab::kSettings)) {
+            return Tab::kSettings;
           }
         } else if (button_index_y == 1) {
           if (button_index_x == 0) {
@@ -468,10 +491,10 @@ Tab Assignments() {
         break;
       case 'q':
       case 'Q':
-        return Tab::NONE;
+        return Tab::kNone;
       default:
         break;
     }
   }
-  return Tab::NONE;
+  return Tab::kNone;
 }

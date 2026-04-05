@@ -1,22 +1,24 @@
-#pragma once
+#ifndef INTERFACE_H
+#define INTERFACE_H
+
 #include <ncurses.h>
 
 #include <string>
 #include <vector>
 enum class Tab : int {
-  HOME = 0,
-  ASSIGNMENTS,
-  CLASSES,
-  GRADES,
-  CALENDAR,
-  SETTINGS,
-  NONE
+  kHome = 0,
+  kAssignments,
+  kClasses,
+  kGrades,
+  kCalendar,
+  kSettings,
+  kNone
 };
 
 struct Button {
   const char* label;
   bool focused;
-  void Draw(bool notab = false) {
+  void Draw(bool notab = false) const {
     if (focused) {
       attron(A_REVERSE);
     }
@@ -29,13 +31,13 @@ struct Button {
 };
 
 enum Style : int {
-  NORMAL = 0,
-  BOLD = 1 << 0,
-  ITALIC = 1 << 1,
-  DIM = 1 << 2,
-  REVERSE = 1 << 3,
-  HEADER = 1 << 4,
-  SUBHEADER = 1 << 5,
+  kNormal = 0,
+  kBold = 1 << 0,
+  kItalic = 1 << 1,
+  kDim = 1 << 2,
+  kReverse = 1 << 3,
+  kHeader = 1 << 4,
+  kSubheader = 1 << 5,
 };
 
 struct TextObject {
@@ -61,8 +63,9 @@ inline bool disable_fancy_text = false;
 struct Interface {
   std::vector<TextObject> texts;
 
-  void AddText(int x, int y, std::string_view content, int style = NORMAL) {
-    texts.push_back({x, y, std::string(content), style});
+  void AddText(int x, int y, std::string_view content, int style = kNormal) {
+    texts.push_back(
+        {.x = x, .y = y, .content = std::string(content), .style = style});
   }
 
   void Draw(Tab active_tab, int focused_tab = -1,
@@ -76,24 +79,25 @@ struct Interface {
     for (const auto& text : texts) {
       move(text.y, text.x);
       for (int i = 0; i < interface_config::padding_left; ++i) printw(" ");
-      if (text.style & HEADER) {
+      if (text.style & kHeader) {
         indent_level = 0;
-      } else if (text.style & SUBHEADER) {
+      } else if (text.style & kSubheader) {
         indent_level = 1;
       }
       for (int i = 0; i < indent_level; ++i) {
         printw("  ");
       }
-      if (text.style & BOLD || text.style & HEADER || text.style & SUBHEADER) {
+      if (text.style & kBold || text.style & kHeader ||
+          text.style & kSubheader) {
         attron(A_BOLD);
       }
-      if (text.style & ITALIC) {
+      if (text.style & kItalic) {
         attron(A_ITALIC);
       }
-      if (text.style & DIM || text.style & SUBHEADER) {
+      if (text.style & kDim || text.style & kSubheader) {
         attron(A_DIM);
       }
-      if (text.style & REVERSE) {
+      if (text.style & kReverse) {
         attron(A_REVERSE);
       }
       if (interface_config::disable_fancy_text) {
@@ -101,9 +105,9 @@ struct Interface {
       }
       printw("%s", text.content.c_str());
       attroff(A_BOLD | A_ITALIC | A_DIM | A_REVERSE);
-      if (text.style & HEADER) {
+      if (text.style & kHeader) {
         indent_level = 1;
-      } else if (text.style & SUBHEADER) {
+      } else if (text.style & kSubheader) {
         indent_level = 2;
       }
     }
@@ -112,3 +116,5 @@ struct Interface {
     refresh();
   }
 };
+
+#endif  // INTERFACE_H

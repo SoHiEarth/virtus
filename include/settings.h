@@ -1,4 +1,6 @@
-#pragma once
+#ifndef SETTINGS_H
+#define SETTINGS_H
+
 #include "interface.h"
 
 namespace settings {
@@ -14,3 +16,5 @@ extern std::string student_last_name;
 Tab Settings();
 void LoadUserSettings();
 void SaveUserSettings();
+
+#endif  // SETTINGS_H

@@ -40,29 +40,29 @@ int main() {
       }
     }
   }
-  Tab current_tab = Tab::HOME;
-  while (current_tab != Tab::NONE) {
+  Tab current_tab = Tab::kHome;
+  while (current_tab != Tab::kNone) {
     switch (current_tab) {
-      case Tab::HOME:
+      case Tab::kHome:
         current_tab = Home();
         break;
-      case Tab::ASSIGNMENTS:
+      case Tab::kAssignments:
         current_tab = Assignments();
         break;
-      case Tab::CLASSES:
+      case Tab::kClasses:
         current_tab = Classes();
         break;
-      case Tab::GRADES:
+      case Tab::kGrades:
         current_tab = Grades();
         break;
-      case Tab::CALENDAR:
+      case Tab::kCalendar:
         current_tab = Calendar();
         break;
-      case Tab::SETTINGS:
+      case Tab::kSettings:
         current_tab = Settings();
         break;
       default:
-        current_tab = Tab::NONE;
+        current_tab = Tab::kNone;
         break;
     }
   }

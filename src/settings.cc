@@ -8,7 +8,7 @@
 #include "calculate.h"
 #include "interface.h"
 
-constexpr int SETTING_NAME_WIDTH = 30;
+constexpr int kSettingNameWidth = 30;
 #define SETTING_STRING(display_name, var_name) \
   {SETTING, display_name,                      \
    []() {                                      \
@@ -16,27 +16,27 @@ constexpr int SETTING_NAME_WIDTH = 30;
      char input[100];                          \
      mvprintw(LINES - 1, 0, "Enter Value:");   \
      getnstr(input, 99);                       \
-     var_name = std::string(input);            \
+     (var_name) = std::string(input);          \
    },                                          \
    []() { return var_name; }}
-#define SETTING_BOOL(display_name, var_name)              \
-  {SETTING, display_name, []() { var_name = !var_name; }, \
-   []() { return var_name ? "On" : "Off"; }}
-#define SETTING_INT(display_name, var_name)                \
-  {SETTING, display_name,                                  \
-   []() {                                                  \
-     echo();                                               \
-     char input[100] = {0};                                \
-     move(LINES - 1, 0);                                   \
-     clrtoeol();                                           \
-     mvprintw(LINES - 1, 0, "Enter Value: ");              \
-     getnstr(input, 99);                                   \
-     noecho();                                             \
-     try {                                                 \
-       if (strlen(input) > 0) var_name = std::stoi(input); \
-     } catch (const std::exception&) {                     \
-     }                                                     \
-   },                                                      \
+#define SETTING_BOOL(display_name, var_name)                  \
+  {SETTING, display_name, []() { (var_name) = !(var_name); }, \
+   []() { return (var_name) ? "On" : "Off"; }}
+#define SETTING_INT(display_name, var_name)                  \
+  {SETTING, display_name,                                    \
+   []() {                                                    \
+     echo();                                                 \
+     char input[100] = {0};                                  \
+     move(LINES - 1, 0);                                     \
+     clrtoeol();                                             \
+     mvprintw(LINES - 1, 0, "Enter Value: ");                \
+     getnstr(input, 99);                                     \
+     noecho();                                               \
+     try {                                                   \
+       if (strlen(input) > 0) (var_name) = std::stoi(input); \
+     } catch (const std::exception&) {                       \
+     }                                                       \
+   },                                                        \
    []() { return std::to_string(var_name); }}
 
 namespace settings {
@@ -48,6 +48,16 @@ std::string school_name = "Default School";
 std::string student_first_name = "John";
 std::string student_last_name = "Doe";
 }  // namespace user_settings
+
+namespace {
+enum SettingTypeMarker { kSeperator, SETTING };
+struct Setting {
+  SettingTypeMarker type = SETTING;
+  std::string name;
+  std::function<void()> toggle = []() {};
+  std::function<std::string()> get_status = []() { return ""; };
+};
+}  // namespace
 
 void LoadUserSettings() {
   pugi::xml_document doc;
@@ -64,7 +74,7 @@ void LoadUserSettings() {
   user_settings::gpa_calculation_method =
       static_cast<Method>(settings.child("gpa_calculation_method")
                               .text()
-                              .as_int(static_cast<int>(AVERAGE)));
+                              .as_int(static_cast<int>(kAverage)));
 }
 
 void SaveUserSettings() {
@@ -81,46 +91,44 @@ void SaveUserSettings() {
   doc.save_file("user_settings.xml");
 }
 
-enum SettingTypeMarker { SEPERATOR, SETTING };
-struct Setting {
-  SettingTypeMarker type = SETTING;
-  std::string name = "";
-  std::function<void()> toggle = []() {};
-  std::function<std::string()> get_status = []() { return ""; };
-};
-
 Tab Settings() {
   keypad(stdscr, TRUE);
-  int button_index_x = 5, button_index_y = 0;
+  int button_index_x = 5;
+  int button_index_y = 0;
   std::vector<Setting> settings_list = {
-      {SEPERATOR, "Assignment Settings"},
+      {.type = kSeperator, .name = "Assignment Settings"},
       SETTING_BOOL("Error Logging", settings::error_logging),
-      {SETTING, "Reset User Settings",
-       []() { std::filesystem::remove("user_settings.xml"); },
-       []() { return ""; }},
-      {SEPERATOR, "Profile Settings"},
+      {.type = SETTING,
+       .name = "Reset User Settings",
+       .toggle = []() { std::filesystem::remove("user_settings.xml"); },
+       .get_status = []() { return ""; }},
+      {.type = kSeperator, .name = "Profile Settings"},
       SETTING_STRING("School Name", user_settings::school_name),
       SETTING_STRING("First Name", user_settings::student_first_name),
       SETTING_STRING("Last Name", user_settings::student_last_name),
-      {SEPERATOR, "Interface Settings"},
+      {.type = kSeperator, .name = "Interface Settings"},
       SETTING_BOOL("Show App Title", interface_config::show_app_title),
       SETTING_BOOL("Simple Tab Bar", interface_config::simple_tab_bar),
       SETTING_BOOL("Disable Fancy Text", interface_config::disable_fancy_text),
       SETTING_INT("Padding Left", interface_config::padding_left),
-      {SEPERATOR, "Grade Settings"},
-      {SETTING, "GPA Calculation Method",
-       []() {
-         if (user_settings::gpa_calculation_method == AVERAGE) {
-           user_settings::gpa_calculation_method = INTERNATIONAL_BACCALAUREATE;
-         } else {
-           user_settings::gpa_calculation_method = AVERAGE;
-         }
-       },
-       []() {
-         return (user_settings::gpa_calculation_method == AVERAGE)
-                    ? "Average"
-                    : "International Baccalaureate";
-       }}};
+      {.type = kSeperator, .name = "Grade Settings"},
+      {.type = SETTING,
+       .name = "GPA Calculation Method",
+       .toggle =
+           []() {
+             if (user_settings::gpa_calculation_method == kAverage) {
+               user_settings::gpa_calculation_method =
+                   kInternationalBaccalaureate;
+             } else {
+               user_settings::gpa_calculation_method = kAverage;
+             }
+           },
+       .get_status =
+           []() {
+             return (user_settings::gpa_calculation_method == kAverage)
+                        ? "Average"
+                        : "International Baccalaureate";
+           }}};
   std::vector<size_t> selectable_indices;
   for (size_t i = 0; i < settings_list.size(); ++i) {
     if (settings_list[i].type == SETTING) {
@@ -131,23 +139,23 @@ Tab Settings() {
   while (true) {
     Interface interface;
     int line = interface_config::simple_tab_bar ? 1 : 3;
-    interface.AddText(0, line++, "General", HEADER);
+    interface.AddText(0, line++, "General", kHeader);
     int setting_index = 0;
-    for (auto setting : settings_list) {
-      if (setting.type == SEPERATOR) {
-        interface.AddText(0, line++, setting.name, SUBHEADER);
+    for (const auto& setting : settings_list) {
+      if (setting.type == kSeperator) {
+        interface.AddText(0, line++, setting.name, kSubheader);
       } else {
         setting_index++;
-        int style = NORMAL;
+        int style = kNormal;
         if (button_index_y == setting_index && button_index_x == 0) {
-          style |= REVERSE;
+          style |= kReverse;
         }
-        interface.AddText(0, line, setting.name, style | BOLD);
-        interface.AddText(SETTING_NAME_WIDTH, line++, setting.get_status(),
+        interface.AddText(0, line, setting.name, style | kBold);
+        interface.AddText(kSettingNameWidth, line++, setting.get_status(),
                           style);
       }
     }
-    interface.Draw(Tab::SETTINGS, button_index_y == 0 ? button_index_x : -1);
+    interface.Draw(Tab::kSettings, button_index_y == 0 ? button_index_x : -1);
 
     auto ch = getch();
     switch (ch) {
@@ -175,16 +183,20 @@ Tab Settings() {
         break;
       case '\n':
         if (button_index_y == 0) {
-          if (button_index_x == static_cast<int>(Tab::HOME)) {
-            return Tab::HOME;
-          } else if (button_index_x == static_cast<int>(Tab::ASSIGNMENTS)) {
-            return Tab::ASSIGNMENTS;
-          } else if (button_index_x == static_cast<int>(Tab::CLASSES)) {
-            return Tab::CLASSES;
-          } else if (button_index_x == static_cast<int>(Tab::GRADES)) {
-            return Tab::GRADES;
-          } else if (button_index_x == static_cast<int>(Tab::CALENDAR)) {
-            return Tab::CALENDAR;
+          if (button_index_x == static_cast<int>(Tab::kHome)) {
+            return Tab::kHome;
+          }
+          if (button_index_x == static_cast<int>(Tab::kAssignments)) {
+            return Tab::kAssignments;
+          }
+          if (button_index_x == static_cast<int>(Tab::kClasses)) {
+            return Tab::kClasses;
+          }
+          if (button_index_x == static_cast<int>(Tab::kGrades)) {
+            return Tab::kGrades;
+          }
+          if (button_index_x == static_cast<int>(Tab::kCalendar)) {
+            return Tab::kCalendar;
           }
         } else {
           settings_list.at(selectable_indices.at(button_index_y - 1)).toggle();
@@ -192,11 +204,11 @@ Tab Settings() {
         break;
       case 'q':
       case 'Q':
-        return Tab::NONE;
+        return Tab::kNone;
       default:
         break;
     }
   }
   SaveUserSettings();
-  return Tab::NONE;
+  return Tab::kNone;
 }

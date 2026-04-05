@@ -9,12 +9,13 @@
 
 Tab Grades() {
   keypad(stdscr, TRUE);
-  int button_index_x = 3, button_index_y = 0;
+  int button_index_x = 3;
+  int button_index_y = 0;
   auto assignments = LoadAssignmentsFromDatabase();
   while (true) {
     Interface interface;
     int line = interface_config::simple_tab_bar ? 1 : 3;
-    interface.AddText(0, line++, "Overall Grades", HEADER);
+    interface.AddText(0, line++, "Overall Grades", kHeader);
     int grade_sum = 0;
     int grade_count = 0;
     for (const auto& assignment : assignments) {
@@ -29,7 +30,8 @@ Tab Grades() {
                     (grade_count != 0)
                         ? (static_cast<double>(grade_sum) / grade_count)
                         : 0));
-    interface.AddText(0, line++, "Overall Grade Breakdown by Class", SUBHEADER);
+    interface.AddText(0, line++, "Overall Grade Breakdown by Class",
+                      kSubheader);
     std::map<std::string, std::pair<int, int>> class_grades;
     for (const auto& assignment : assignments) {
       if (assignment.completed) {
@@ -53,13 +55,16 @@ Tab Grades() {
                                   class_grade_count)));
       line++;
     }
+    if (class_grades.empty()) {
+      interface.AddText(2, line++, "No classes found. Add one by setting the \"class\" property in a assignment.", kSubheader);
+    }
 
-    interface.AddText(0, line++, "Overall GPA", HEADER);
+    interface.AddText(0, line++, "Overall GPA", kHeader);
     interface.AddText(
         0, line++,
         std::format("Overall GPA: {:.2f}", CalculateGPA(assignments)));
 
-    interface.AddText(0, line++, "Overall GPA Breakdown by Class", SUBHEADER);
+    interface.AddText(0, line++, "Overall GPA Breakdown by Class", kSubheader);
     for (const auto& [class_name, grades] : class_grades) {
       interface.AddText(0, line, class_name);
       interface.AddText(
@@ -80,13 +85,16 @@ Tab Grades() {
         classes.push_back(class_name);
       }
     }
+    if (class_grades.empty()) {
+      interface.AddText(2, line++, "No classes found. Add one by setting the \"class\" property in a assignment.", kSubheader);
+    }
 
-    interface.AddText(0, line++, "Contribution", HEADER);
+    interface.AddText(0, line++, "Contribution", kHeader);
     for (const auto& class_name : classes) {
       interface.AddText(
           0, line++,
           std::format("Grade Contribution by Assignment for {}", class_name),
-          SUBHEADER);
+          kSubheader);
       int line_start = line;
       for (const auto& assignment : assignments) {
         if (assignment.class_name == class_name && assignment.completed) {
@@ -100,15 +108,15 @@ Tab Grades() {
     if (classes.empty()) {
       interface.AddText(0, line++,
                         "No completed assignments to show contribution.",
-                        NORMAL | ITALIC);
+                        kNormal | kItalic);
     }
 
-    interface.AddText(0, line++, "Information", HEADER);
+    interface.AddText(0, line++, "Information", kHeader);
     interface.AddText(0, line++,
                       std::format("Completed Assignments: {}/{}", grade_count,
                                   static_cast<int>(assignments.size())));
 
-    interface.Draw(Tab::GRADES, button_index_y == 0 ? button_index_x : -1);
+    interface.Draw(Tab::kGrades, button_index_y == 0 ? button_index_x : -1);
     auto ch = getch();
     switch (ch) {
       case KEY_UP:
@@ -123,29 +131,29 @@ Tab Grades() {
         }
         break;
       case KEY_RIGHT:
-        if (button_index_x < 4) {
+        if (button_index_x < static_cast<int>(Tab::kSettings)) {
           ++button_index_x;
         }
         break;
       case '\n':
-        if (button_index_x == static_cast<int>(Tab::HOME)) {
-          return Tab::HOME;
-        } else if (button_index_x == static_cast<int>(Tab::ASSIGNMENTS)) {
-          return Tab::ASSIGNMENTS;
-        } else if (button_index_x == static_cast<int>(Tab::CLASSES)) {
-          return Tab::CLASSES;
-        } else if (button_index_x == static_cast<int>(Tab::CALENDAR)) {
-          return Tab::CALENDAR;
-        } else if (button_index_x == static_cast<int>(Tab::SETTINGS)) {
-          return Tab::SETTINGS;
+        if (button_index_x == static_cast<int>(Tab::kHome)) {
+          return Tab::kHome;
+        } else if (button_index_x == static_cast<int>(Tab::kAssignments)) {
+          return Tab::kAssignments;
+        } else if (button_index_x == static_cast<int>(Tab::kClasses)) {
+          return Tab::kClasses;
+        } else if (button_index_x == static_cast<int>(Tab::kCalendar)) {
+          return Tab::kCalendar;
+        } else if (button_index_x == static_cast<int>(Tab::kSettings)) {
+          return Tab::kSettings;
         }
         break;
       case 'q':
       case 'Q':
-        return Tab::NONE;
+        return Tab::kNone;
       default:
         break;
     }
   }
-  return Tab::NONE;
+  return Tab::kNone;
 }

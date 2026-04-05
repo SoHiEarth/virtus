@@ -6,14 +6,17 @@
 #include "assignment.h"
 #include "interface.h"
 
+namespace {
 std::map<int, std::string> month_names = {
     {0, "January"},   {1, "February"}, {2, "March"},     {3, "April"},
     {4, "May"},       {5, "June"},     {6, "July"},      {7, "August"},
     {8, "September"}, {9, "October"},  {10, "November"}, {11, "December"}};
+}
 
 Tab Calendar() {
   keypad(stdscr, TRUE);
-  int button_index_x = static_cast<int>(Tab::CALENDAR), button_index_y = 0;
+  int button_index_x = static_cast<int>(Tab::kCalendar);
+  int button_index_y = 0;
   time_t t = time(nullptr);
   tm* now = localtime(&t);
 
@@ -41,7 +44,9 @@ Tab Calendar() {
     std::map<int, Assignment*> assignments_for_month;
     auto assignments = LoadAssignmentsFromDatabase();
     for (auto& assignment : assignments) {
-      int a_year, a_month, a_day;
+      int a_year;
+      int a_month;
+      int a_day;
       sscanf(assignment.due_date.c_str(), "%d-%d-%d", &a_year, &a_month,
              &a_day);
       if (a_year == year && a_month - 1 == month) {
@@ -54,26 +59,28 @@ Tab Calendar() {
     interface.AddText(0, line++,
                       std::format("Calendar (Year: {}, Month: {})", year,
                                   month_names.at(month)),
-                      HEADER);
-    interface.Draw(Tab::CALENDAR, button_index_y == 0 ? button_index_x : -1);
+                      kHeader);
+    interface.Draw(Tab::kCalendar, button_index_y == 0 ? button_index_x : -1);
     mvprintw(line++, interface_config::padding_left + 2,
              "Su       |Mo       |Tu       |We       |Th       |Fr       |Sa   "
              "     ");
     for (int i = 0; i < 5; i++) {
       for (int j = 0; j < 20; j++) {
-        mvprintw(3 * (i + 1) + 1, j + interface_config::padding_left + 2, "-");
+        mvprintw((3 * (i + 1)) + 1, j + interface_config::padding_left + 2,
+                 "-");
       }
       printw("\n");
       for (int i = 0; i < 6; i++) {
         for (int j = 0; j < 70; j++) {
-          mvprintw(3 + i * 3 + 1, j + interface_config::padding_left + 2, "-");
+          mvprintw(3 + (i * 3) + 1, j + interface_config::padding_left + 2,
+                   "-");
         }
       }
       int row = 0;
       int col = start_day;
       for (int day = 1; day <= days_in_month; day++) {
-        mvprintw(4 + row * 3 + 1, col * 10 + interface_config::padding_left + 2,
-                 "%2d", day);
+        mvprintw(4 + (row * 3) + 1,
+                 (col * 10) + interface_config::padding_left + 2, "%2d", day);
         col++;
         if (col == 7) {
           col = 0;
@@ -93,8 +100,8 @@ Tab Calendar() {
     SetHeader("Assignment Info");
     int display_index = 0;
     for (int i = 1; i <= days_in_month; ++i) {
-      if (assignments_for_month.find(i) != assignments_for_month.end()) {
-        auto assignment = assignments_for_month.at(i);
+      if (assignments_for_month.contains(i)) {
+        auto* assignment = assignments_for_month.at(i);
         if (button_index_y - 1 == display_index) attron(A_BOLD | A_REVERSE);
         mvprintw(line + display_index, interface_config::padding_left + 2,
                  "On %02d/%02d: %s (Class: %s)\n", month + 1, i,
@@ -103,21 +110,28 @@ Tab Calendar() {
         display_index++;
       }
     }
+    if (assignments_for_month.empty()) {
+      mvprintw(line + display_index, interface_config::padding_left + 2, "Hooray! No assignments due this date.");
+    }
     line++;
     refresh();
     auto ch = getch();
     if (ch == '\n') {
       if (button_index_y == 0) {
-        if (button_index_x == static_cast<int>(Tab::HOME)) {
-          return Tab::HOME;
-        } else if (button_index_x == static_cast<int>(Tab::ASSIGNMENTS)) {
-          return Tab::ASSIGNMENTS;
-        } else if (button_index_x == static_cast<int>(Tab::CLASSES)) {
-          return Tab::CLASSES;
-        } else if (button_index_x == static_cast<int>(Tab::GRADES)) {
-          return Tab::GRADES;
-        } else if (button_index_x == static_cast<int>(Tab::SETTINGS)) {
-          return Tab::SETTINGS;
+        if (button_index_x == static_cast<int>(Tab::kHome)) {
+          return Tab::kHome;
+        }
+        if (button_index_x == static_cast<int>(Tab::kAssignments)) {
+          return Tab::kAssignments;
+        }
+        if (button_index_x == static_cast<int>(Tab::kClasses)) {
+          return Tab::kClasses;
+        }
+        if (button_index_x == static_cast<int>(Tab::kGrades)) {
+          return Tab::kGrades;
+        }
+        if (button_index_x == static_cast<int>(Tab::kSettings)) {
+          return Tab::kSettings;
         }
       } else {
         int display_index = 0;
@@ -135,7 +149,7 @@ Tab Calendar() {
         --button_index_x;
       }
     } else if (ch == KEY_RIGHT) {
-      if (button_index_x < static_cast<int>(Tab::SETTINGS)) {
+      if (button_index_x < static_cast<int>(Tab::kSettings)) {
         ++button_index_x;
       }
     } else if (ch == KEY_UP) {
@@ -149,7 +163,7 @@ Tab Calendar() {
       }
       button_index_x = 0;
     } else if (ch == 'q' || ch == 'Q') {
-      return Tab::NONE;
+      return Tab::kNone;
     }
   }
 }

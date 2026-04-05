@@ -1,4 +1,6 @@
-#pragma once
+#ifndef ASSIGNMENT_H
+#define ASSIGNMENT_H
+
 #include <ncurses.h>
 
 #include <pugixml.hpp>
@@ -7,10 +9,10 @@
 #include "interface.h"
 
 struct Assignment {
-  std::string name = "";
-  std::string class_name = "";
-  std::string description = "";
-  std::string due_date = "";
+  std::string name;
+  std::string class_name;
+  std::string description;
+  std::string due_date;
   bool completed = false;
   float score = 0;
   float max_score = 100;
@@ -28,3 +30,5 @@ void EditAssignment(Assignment& assignment);
 void AssignmentMenu(Assignment& assignment);
 void AssignmentMenu(Assignment* assignment);
 Tab Assignments();
+
+#endif  // ASSIGNMENT_H

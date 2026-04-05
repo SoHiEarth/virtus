@@ -9,7 +9,8 @@
 
 Tab Classes() {
   keypad(stdscr, TRUE);
-  int button_index_x = 2, button_index_y = 0;
+  int button_index_x = 2;
+  int button_index_y = 0;
   while (true) {
     auto assignments = LoadAssignmentsFromDatabase();
     std::map<std::string, std::vector<Assignment*>> all_class_assignments;
@@ -18,32 +19,38 @@ Tab Classes() {
     }
     Interface interface;
     int line = interface_config::simple_tab_bar ? 1 : 3;
-    interface.AddText(0, line++, "Your Classes", HEADER);
+    interface.AddText(0, line++, "Your Classes", kHeader);
     for (const auto& [class_name, class_assignments] : all_class_assignments) {
-      interface.AddText(0, line++, class_name, SUBHEADER);
+      interface.AddText(0, line++, class_name, kSubheader);
       interface.AddText(
           0, line++,
           "Grade: " +
               std::format("{:.2f}", CalculateGrade(assignments, class_name)),
-          NORMAL);
+          kNormal);
       interface.AddText(
           0, line++,
           "GPA: " +
               std::format("{:.2f}", CalculateGPA(assignments, class_name)),
-          NORMAL);
+          kNormal);
       if (assignments.empty()) {
-        interface.AddText(4, line++, "No assignments found.", NORMAL);
+        interface.AddText(4, line++, "No assignments found.", kNormal);
       } else {
         for (const auto& assignment : class_assignments) {
           interface.AddText(
               4, line++,
               "- " + assignment->name + " (Due: " + assignment->due_date + ")",
-              NORMAL);
+              kNormal);
         }
       }
       line++;
     }
-    interface.Draw(Tab::CLASSES, button_index_y == 0 ? button_index_x : -1);
+    if (all_class_assignments.empty()) {
+      interface.AddText(0, line++,
+                        "No classes found. Add one by setting the \"class\" "
+                        "parameter in a assignment.",
+                        kSubheader);
+    }
+    interface.Draw(Tab::kClasses, button_index_y == 0 ? button_index_x : -1);
     auto ch = getch();
     switch (ch) {
       case KEY_UP:
@@ -58,29 +65,29 @@ Tab Classes() {
         }
         break;
       case KEY_RIGHT:
-        if (button_index_x < static_cast<int>(Tab::SETTINGS)) {
+        if (button_index_x < static_cast<int>(Tab::kSettings)) {
           ++button_index_x;
         }
         break;
       case '\n':
-        if (button_index_x == static_cast<int>(Tab::HOME)) {
-          return Tab::HOME;
-        } else if (button_index_x == static_cast<int>(Tab::ASSIGNMENTS)) {
-          return Tab::ASSIGNMENTS;
-        } else if (button_index_x == static_cast<int>(Tab::GRADES)) {
-          return Tab::GRADES;
-        } else if (button_index_x == static_cast<int>(Tab::CALENDAR)) {
-          return Tab::CALENDAR;
-        } else if (button_index_x == static_cast<int>(Tab::SETTINGS)) {
-          return Tab::SETTINGS;
+        if (button_index_x == static_cast<int>(Tab::kHome)) {
+          return Tab::kHome;
+        } else if (button_index_x == static_cast<int>(Tab::kAssignments)) {
+          return Tab::kAssignments;
+        } else if (button_index_x == static_cast<int>(Tab::kGrades)) {
+          return Tab::kGrades;
+        } else if (button_index_x == static_cast<int>(Tab::kCalendar)) {
+          return Tab::kCalendar;
+        } else if (button_index_x == static_cast<int>(Tab::kSettings)) {
+          return Tab::kSettings;
         }
         break;
       case 'q':
       case 'Q':
-        return Tab::NONE;
+        return Tab::kNone;
       default:
         break;
     }
   }
-  return Tab::NONE;
+  return Tab::kNone;
 }
