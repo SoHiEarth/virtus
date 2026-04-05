@@ -1,12 +1,12 @@
 #include "interface.h"
 
-void SetHeader(const char *title) {
+void SetHeader(const char* title) {
   attron(A_BOLD);
   printw("%s\n", title);
   attroff(A_BOLD);
 }
 
-void SetSubHeader(const char *subtitle) {
+void SetSubHeader(const char* subtitle) {
   attron(A_BOLD | A_DIM);
   printw("%s\n", subtitle);
   attroff(A_BOLD | A_DIM);

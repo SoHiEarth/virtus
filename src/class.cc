@@ -1,9 +1,11 @@
 #include "class.h"
+
+#include <format>
+#include <map>
+
 #include "assignment.h"
 #include "calculate.h"
 #include "interface.h"
-#include <format>
-#include <map>
 
 Tab Classes() {
   keypad(stdscr, TRUE);
@@ -19,13 +21,24 @@ Tab Classes() {
     interface.AddText(0, line++, "Your Classes", HEADER);
     for (const auto& [class_name, class_assignments] : all_class_assignments) {
       interface.AddText(0, line++, class_name, SUBHEADER);
-      interface.AddText(0, line++, "Grade: " + std::format("{:.2f}", CalculateGrade(assignments, class_name)), NORMAL);
-      interface.AddText(0, line++, "GPA: " + std::format("{:.2f}", CalculateGPA(assignments, class_name)), NORMAL);
+      interface.AddText(
+          0, line++,
+          "Grade: " +
+              std::format("{:.2f}", CalculateGrade(assignments, class_name)),
+          NORMAL);
+      interface.AddText(
+          0, line++,
+          "GPA: " +
+              std::format("{:.2f}", CalculateGPA(assignments, class_name)),
+          NORMAL);
       if (assignments.empty()) {
         interface.AddText(4, line++, "No assignments found.", NORMAL);
       } else {
         for (const auto& assignment : class_assignments) {
-          interface.AddText(4, line++, "- " + assignment->name + " (Due: " + assignment->due_date + ")", NORMAL);
+          interface.AddText(
+              4, line++,
+              "- " + assignment->name + " (Due: " + assignment->due_date + ")",
+              NORMAL);
         }
       }
       line++;
@@ -33,40 +46,40 @@ Tab Classes() {
     interface.Draw(Tab::CLASSES, button_index_y == 0 ? button_index_x : -1);
     auto ch = getch();
     switch (ch) {
-    case KEY_UP:
-      if (button_index_y > 0) {
-        --button_index_y;
-      }
-      button_index_x = 0;
-      break;
-    case KEY_LEFT:
-      if (button_index_x > 0) {
-        --button_index_x;
-      }
-      break;
-    case KEY_RIGHT:
-      if (button_index_x < static_cast<int>(Tab::SETTINGS)) {
-        ++button_index_x;
-      }
-      break;
-    case '\n':
-      if (button_index_x == static_cast<int>(Tab::HOME)) {
-        return Tab::HOME;
-      } else if (button_index_x == static_cast<int>(Tab::ASSIGNMENTS)) {
-        return Tab::ASSIGNMENTS;
-      } else if (button_index_x == static_cast<int>(Tab::GRADES)) {
-        return Tab::GRADES;
-      } else if (button_index_x == static_cast<int>(Tab::CALENDAR)) {
-        return Tab::CALENDAR;
-      } else if (button_index_x == static_cast<int>(Tab::SETTINGS)) {
-        return Tab::SETTINGS;
-      }
-      break;
-    case 'q':
-    case 'Q':
-      return Tab::NONE;
-    default:
-      break;
+      case KEY_UP:
+        if (button_index_y > 0) {
+          --button_index_y;
+        }
+        button_index_x = 0;
+        break;
+      case KEY_LEFT:
+        if (button_index_x > 0) {
+          --button_index_x;
+        }
+        break;
+      case KEY_RIGHT:
+        if (button_index_x < static_cast<int>(Tab::SETTINGS)) {
+          ++button_index_x;
+        }
+        break;
+      case '\n':
+        if (button_index_x == static_cast<int>(Tab::HOME)) {
+          return Tab::HOME;
+        } else if (button_index_x == static_cast<int>(Tab::ASSIGNMENTS)) {
+          return Tab::ASSIGNMENTS;
+        } else if (button_index_x == static_cast<int>(Tab::GRADES)) {
+          return Tab::GRADES;
+        } else if (button_index_x == static_cast<int>(Tab::CALENDAR)) {
+          return Tab::CALENDAR;
+        } else if (button_index_x == static_cast<int>(Tab::SETTINGS)) {
+          return Tab::SETTINGS;
+        }
+        break;
+      case 'q':
+      case 'Q':
+        return Tab::NONE;
+      default:
+        break;
     }
   }
   return Tab::NONE;

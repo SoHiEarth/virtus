@@ -1,26 +1,27 @@
 #include "onboarding.h"
+
+#include <ncurses.h>
+
+#include <map>
+#include <stdexcept>
+#include <string>
+
 #include "interface.h"
 #include "settings.h"
-#include <map>
-#include <ncurses.h>
-#include <string>
-#include <stdexcept>
 
 void onboard::Setup() {
   std::map<std::string, std::string> inputs{
-    {"First Name", ""},
-    {"Last Name", ""},
-    {"School Name", ""}
-  };
+      {"First Name", ""}, {"Last Name", ""}, {"School Name", ""}};
   int button_index_y = 0;
   keypad(stdscr, TRUE);
   while (true) {
     Interface interface;
     int line = 3;
     interface.AddText(0, line++, "Initial Setup", HEADER);
-    interface.AddText(0, line++, "Welcome to Virtus. Let's set up your profile.", SUBHEADER);
+    interface.AddText(
+        0, line++, "Welcome to Virtus. Let's set up your profile.", SUBHEADER);
     int index = 0;
-    for (const auto &input : inputs) {
+    for (const auto& input : inputs) {
       int style = NORMAL;
       if (index == button_index_y) {
         style |= REVERSE;
@@ -58,10 +59,11 @@ void onboard::Setup() {
           mvprintw(LINES - 1, 0, "Enter %s: ", inputs.begin()->first.c_str());
           getnstr(input, 99);
           noecho();
-          std::next(inputs.begin(), button_index_y)->second = std::string(input);
+          std::next(inputs.begin(), button_index_y)->second =
+              std::string(input);
         } else {
           bool all_filled = true;
-          for (const auto &input : inputs) {
+          for (const auto& input : inputs) {
             if (input.second.empty()) {
               all_filled = false;
               break;
@@ -84,12 +86,14 @@ void onboard::Introduce() {
   Interface interface;
   int line = 3;
   interface.AddText(0, line++, "Welcome to Virtus!", HEADER);
-  interface.AddText(0, line++, "Virtus is your all-in-one academic management tool.", SUBHEADER);
+  interface.AddText(0, line++,
+                    "Virtus is your all-in-one academic management tool.",
+                    SUBHEADER);
   interface.AddText(0, line++, "With Virtus, you can:");
   interface.AddText(2, line++, "- Track assignments and due dates");
   interface.AddText(2, line++, "- Monitor your grades and performance");
   interface.AddText(2, line++, "- Manage your calendar");
-  interface.AddText(0, line+=2, "Press any key to continue...", ITALIC);
+  interface.AddText(0, line += 2, "Press any key to continue...", ITALIC);
   interface.Draw(Tab::NONE, -1, true);
   auto ch = getch();
   switch (ch) {
@@ -101,13 +105,21 @@ void onboard::Introduce() {
   Interface tab_interface;
   int tab_line = 3;
   tab_interface.AddText(0, tab_line++, "Tabs", HEADER);
-  tab_interface.AddText(0, tab_line++, "Above is the tab bar. Use it to navigate between different sections:", SUBHEADER);
-  tab_interface.AddText(2, tab_line++, "- Home: Overview of your academic status");
-  tab_interface.AddText(2, tab_line++, "- Assignments: View and manage your assignments");
-  tab_interface.AddText(2, tab_line++, "- Grades: Track your grades and performance");
+  tab_interface.AddText(
+      0, tab_line++,
+      "Above is the tab bar. Use it to navigate between different sections:",
+      SUBHEADER);
+  tab_interface.AddText(2, tab_line++,
+                        "- Home: Overview of your academic status");
+  tab_interface.AddText(2, tab_line++,
+                        "- Assignments: View and manage your assignments");
+  tab_interface.AddText(2, tab_line++,
+                        "- Grades: Track your grades and performance");
   tab_interface.AddText(2, tab_line++, "- Calendar: Manage your schedule");
-  tab_interface.AddText(2, tab_line++, "- Settings: Customize your Virtus experience");
-  tab_interface.AddText(0, tab_line+=2, "Press any key to finish the introduction...", ITALIC);
+  tab_interface.AddText(2, tab_line++,
+                        "- Settings: Customize your Virtus experience");
+  tab_interface.AddText(0, tab_line += 2,
+                        "Press any key to finish the introduction...", ITALIC);
   tab_interface.Draw(Tab::NONE, -1, true);
   auto ch2 = getch();
   switch (ch2) {

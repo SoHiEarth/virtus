@@ -3,4 +3,4 @@
 namespace onboard {
 void Setup();
 void Introduce();
-} // namespace onboard
+}  // namespace onboard

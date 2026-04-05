@@ -1,5 +1,6 @@
 #pragma once
 #include <ncurses.h>
+
 #include <string>
 #include <vector>
 enum class Tab : int {
@@ -13,7 +14,7 @@ enum class Tab : int {
 };
 
 struct Button {
-  const char *label;
+  const char* label;
   bool focused;
   void Draw(bool notab = false) {
     if (focused) {
@@ -23,8 +24,7 @@ struct Button {
     if (focused) {
       attroff(A_REVERSE);
     }
-    if (!notab)
-      printw("\t");
+    if (!notab) printw("\t");
   }
 };
 
@@ -45,8 +45,8 @@ struct TextObject {
   int style;
 };
 
-void SetHeader(const char *title);
-void SetSubHeader(const char *subtitle);
+void SetHeader(const char* title);
+void SetSubHeader(const char* subtitle);
 void DrawTabBar(std::vector<std::string> tabs, Tab active_tab,
                 int focused_index = 0, bool show_app_title = true,
                 bool disabled_tab_bar = false);
@@ -56,7 +56,7 @@ inline int padding_left = 2;
 inline bool show_app_title = true;
 inline bool simple_tab_bar = false;
 inline bool disable_fancy_text = false;
-} // namespace interface_config
+}  // namespace interface_config
 
 struct Interface {
   std::vector<TextObject> texts;
@@ -73,10 +73,9 @@ struct Interface {
         active_tab, focused_tab, interface_config::show_app_title,
         disabled_tab_bar);
     int indent_level = 0;
-    for (const auto &text : texts) {
+    for (const auto& text : texts) {
       move(text.y, text.x);
-      for (int i = 0; i < interface_config::padding_left; ++i)
-        printw(" ");
+      for (int i = 0; i < interface_config::padding_left; ++i) printw(" ");
       if (text.style & HEADER) {
         indent_level = 0;
       } else if (text.style & SUBHEADER) {

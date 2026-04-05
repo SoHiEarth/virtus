@@ -7,7 +7,7 @@ namespace user_settings {
 extern Method gpa_calculation_method;
 }
 struct Assignment;
-double CalculateGPA(const std::vector<Assignment> &assignments,
+double CalculateGPA(const std::vector<Assignment>& assignments,
                     std::string class_name = "");
-double CalculateGrade(const std::vector<Assignment> &assignments,
+double CalculateGrade(const std::vector<Assignment>& assignments,
                       std::string class_name = "");

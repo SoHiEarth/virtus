@@ -1,8 +1,10 @@
 #include "calendar.h"
-#include "assignment.h"
-#include "interface.h"
+
 #include <format>
 #include <map>
+
+#include "assignment.h"
+#include "interface.h"
 
 std::map<int, std::string> month_names = {
     {0, "January"},   {1, "February"}, {2, "March"},     {3, "April"},
@@ -13,10 +15,10 @@ Tab Calendar() {
   keypad(stdscr, TRUE);
   int button_index_x = static_cast<int>(Tab::CALENDAR), button_index_y = 0;
   time_t t = time(nullptr);
-  tm *now = localtime(&t);
+  tm* now = localtime(&t);
 
   int year = now->tm_year + 1900;
-  int month = now->tm_mon; // 0–11
+  int month = now->tm_mon;  // 0–11
 
   tm first = {};
   first.tm_year = now->tm_year;
@@ -36,9 +38,9 @@ Tab Calendar() {
   }
 
   while (true) {
-    std::map<int, Assignment *> assignments_for_month;
+    std::map<int, Assignment*> assignments_for_month;
     auto assignments = LoadAssignmentsFromDatabase();
-    for (auto &assignment : assignments) {
+    for (auto& assignment : assignments) {
       int a_year, a_month, a_day;
       sscanf(assignment.due_date.c_str(), "%d-%d-%d", &a_year, &a_month,
              &a_day);
@@ -93,13 +95,11 @@ Tab Calendar() {
     for (int i = 1; i <= days_in_month; ++i) {
       if (assignments_for_month.find(i) != assignments_for_month.end()) {
         auto assignment = assignments_for_month.at(i);
-        if (button_index_y - 1 == display_index)
-          attron(A_BOLD | A_REVERSE);
+        if (button_index_y - 1 == display_index) attron(A_BOLD | A_REVERSE);
         mvprintw(line + display_index, interface_config::padding_left + 2,
                  "On %02d/%02d: %s (Class: %s)\n", month + 1, i,
                  assignment->name.c_str(), assignment->class_name.c_str());
-        if (button_index_y - 1 == display_index)
-          attroff(A_BOLD | A_REVERSE);
+        if (button_index_y - 1 == display_index) attroff(A_BOLD | A_REVERSE);
         display_index++;
       }
     }
@@ -121,7 +121,7 @@ Tab Calendar() {
         }
       } else {
         int display_index = 0;
-        for (auto &[day, assignment] : assignments_for_month) {
+        for (auto& [day, assignment] : assignments_for_month) {
           if (display_index == button_index_y - 1) {
             AssignmentMenu(assignment);
             SaveAssignmentsToDatabase(assignments);

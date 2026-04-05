@@ -1,10 +1,12 @@
 #include "home.h"
+
+#include <format>
+#include <vector>
+
 #include "assignment.h"
 #include "calculate.h"
 #include "interface.h"
 #include "settings.h"
-#include <format>
-#include <vector>
 
 Tab Home() {
   keypad(stdscr, TRUE);
@@ -37,11 +39,11 @@ Tab Home() {
           column += 30, line,
           std::format("Completed: {}", assignments[i].completed ? "Yes" : "No"),
           style);
-      interface.AddText(column += 30, line,
-                        std::format("Score: {:.2f}/{:.2f}",
-                                    assignments[i].score,
-                                    assignments[i].max_score),
-                        style);
+      interface.AddText(
+          column += 30, line,
+          std::format("Score: {:.2f}/{:.2f}", assignments[i].score,
+                      assignments[i].max_score),
+          style);
       line++;
     }
     if (assignments.size() > 5) {
@@ -64,7 +66,7 @@ Tab Home() {
     interface.AddText(0, line++, "Grades Summary", SUBHEADER);
     float grade_sum = 0;
     int grade_count = 0;
-    for (const auto &assignment : assignments) {
+    for (const auto& assignment : assignments) {
       if (assignment.completed) {
         grade_sum += (assignment.score / assignment.max_score) * 100.0f;
         ++grade_count;
@@ -72,10 +74,8 @@ Tab Home() {
     }
     interface.AddText(
         0, line++,
-        std::format(
-            "Overall Grade: {:.2f}%, GPA: {:.2f}",
-            CalculateGrade(assignments),
-            CalculateGPA(assignments)));
+        std::format("Overall Grade: {:.2f}%, GPA: {:.2f}",
+                    CalculateGrade(assignments), CalculateGPA(assignments)));
     interface.AddText(0, line++,
                       std::format("Completed Assignments: {}/{}", grade_count,
                                   static_cast<int>(assignments.size())));

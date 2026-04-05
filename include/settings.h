@@ -9,7 +9,7 @@ namespace user_settings {
 extern std::string school_name;
 extern std::string student_first_name;
 extern std::string student_last_name;
-} // namespace user_settings
+}  // namespace user_settings
 
 Tab Settings();
 void LoadUserSettings();

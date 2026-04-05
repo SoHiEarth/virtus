@@ -1,8 +1,10 @@
 #pragma once
-#include "interface.h"
 #include <ncurses.h>
+
 #include <pugixml.hpp>
 #include <vector>
+
+#include "interface.h"
 
 struct Assignment {
   std::string name = "";
@@ -15,14 +17,14 @@ struct Assignment {
 };
 
 std::vector<Assignment> LoadAssignmentsFromDatabase();
-void SaveAssignmentsToDatabase(const std::vector<Assignment> &assignments);
+void SaveAssignmentsToDatabase(const std::vector<Assignment>& assignments);
 
 struct NewAssignmentResult {
   bool canceled;
   Assignment assignment;
 };
 NewAssignmentResult NewAssignment();
-void EditAssignment(Assignment &assignment);
-void AssignmentMenu(Assignment &assignment);
-void AssignmentMenu(Assignment *assignment);
+void EditAssignment(Assignment& assignment);
+void AssignmentMenu(Assignment& assignment);
+void AssignmentMenu(Assignment* assignment);
 Tab Assignments();
