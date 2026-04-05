@@ -5,7 +5,6 @@
 **A TUI minimal assignment manager + grade tracker.**
 
 <img src="assets/logo_banner.png" alt="banner" width="800"/>
-![Virtus Banner](assets/logo_banner.png)
 
 </div>
 
