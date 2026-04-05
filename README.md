@@ -28,6 +28,15 @@ Virtus is a school assignment manager and grade tracker, helping you manage your
 **A simple calendar that lets you know of your recent assignments and their proximity to the current date.**
 
 ## Installation
+### Install Dependencies
+Install the following:
+`
+ncurses
+pugixml
+`
+The command to install the dependencies on Arch Linux is as follows:
+`sudo pacman -Sy ncurses pugixml`
+
 ### Download & Run
 1. Download the latest release from the [releases page](https://github.com/sohiearth/virtus/releases).
 2. Add permissions to execute the file:
