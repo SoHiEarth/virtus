@@ -32,28 +32,48 @@ Virtus is a **school assignment manager and grade tracker**, helping you manage 
 
 ### Home
 
+<div align="center">
+   
 ![Home Preview](assets/preview_home.png)
 **A glancable, function-oriented home interface full of data and intuitive to use.**
 
+</div>
+
 ### Assignments
 
+<div align="center">
+   
 ![Assignments Preview](assets/preview_assignment.png)
 **A simple interface full of knobs and dials.**
 
+</div>
+
 ### Classes
 
+<div align="center">
+   
 ![Classes Preview](assets/preview_class.png)
-**Automatic class sorting and grades calculation based on the class' name. **
+**Automatic class sorting and grades calculation based on the class' name.**
+
+</div>
 
 ### Grades
 
+<div align="center">
+   
 ![Grades Preview](assets/preview_grades.png)
 **A detailed view containing a breakdown of overall/per-class GPA by class or assignment - a novel yet useful feature.**
 
+</div>
+
 ### Finally, Calendar
 
+<div align="center">
+   
 ![Calendar Preview](assets/preview_calendar.png)
 **A simple calendar that lets you know of your recent assignments and their proximity to the current date.**
+
+</div>
 
 ---
 
@@ -66,6 +86,7 @@ Install the following:
 ncurses
 pugixml
 `
+
 The command to install the dependencies on Arch Linux is as follows:
 `sudo pacman -Sy ncurses pugixml`
 
